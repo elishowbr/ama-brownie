@@ -1,10 +1,9 @@
 "use server";
 
-import { PrismaClient } from "../../../generated/prisma";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { prisma } from "@/prisma";
 
-const prisma = new PrismaClient();
 
 // ============================================================================
 // 1. SCHEMAS DE VALIDAÇÃO

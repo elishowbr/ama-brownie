@@ -1,10 +1,9 @@
 "use server";
 
-import { PrismaClient } from "@/../generated/prisma"; // Seu caminho do prisma
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { prisma } from "@/prisma";
 
-const prisma = new PrismaClient();
 
 import { OrderType, PaymentMethod, OrderStatus } from "@/../generated/prisma"
 

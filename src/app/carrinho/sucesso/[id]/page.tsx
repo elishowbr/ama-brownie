@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { PrismaClient } from "@/../generated/prisma";
-import { CheckCircle, MessageCircle, CalendarClock } from "lucide-react";
+import { CheckCircle, MessageCircle, CalendarClock, Clock } from "lucide-react";
 import { notFound } from "next/navigation";
 
 const prisma = new PrismaClient();

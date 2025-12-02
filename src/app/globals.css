@@ -5,12 +5,32 @@
   --foreground: #171717;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+@theme {
+  --color-chocolate-900: #2B1B17;
+  --color-chocolate-800: #4E342E;
+  --color-chocolate-600: #795548;
+  --color-caramelo-500: #D4A373;
+  --color-caramelo-100: #FAE5D3;
+  --color-creme: #FAF9F6;
+  --color-red: red;
+  --color-blue: blue;
 }
+
+input, textarea, select {
+    background-color: white;
+    border: 1px solid var(--color-caramelo-100);
+    color: var(--color-chocolate-900);
+    placeholder-color: var(--color-chocolate-900, 0.4);
+    transition: all .3s;
+
+    &:focus {
+      outline: none;
+      border: 1px solid var(--color-chocolate-900);
+    }
+
+}
+
+
 
 @media (prefers-color-scheme: dark) {
   :root {
@@ -20,7 +40,23 @@
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+@keyframes toastSlideDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-toastSlideDown {
+  animation: toastSlideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideUpFade {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-slideUpFade {
+  animation: slideUpFade 0.4s ease-out forwards;
 }

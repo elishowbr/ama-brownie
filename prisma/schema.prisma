@@ -1,0 +1,128 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  CLIENT
+  ADMIN
+}
+
+enum OrderType {
+  DELIVERY
+  PICKUP   
+}
+
+enum OrderStatus {
+  PENDING          
+  PREPARING        
+  DELIVERING       
+  READY_TO_PICKUP  
+  COMPLETED        
+  CANCELED         
+}
+
+enum PaymentMethod {
+  PIX
+  CREDIT_CARD
+  DEBIT_CARD
+  CASH
+}
+
+model Category {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  slug      String    @unique
+  products  Product[]
+}
+
+model Product {
+  id          String          @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String?
+  imageUrl    String?
+  price       Float
+  promoPrice  Float?
+  
+  categoryId  String          @db.ObjectId
+  category    Category        @relation(fields: [categoryId], references: [id])
+  
+  tags        String[]
+  options     ProductOption[]
+  
+  isAvailable Boolean         @default(true)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  orderItems  OrderItem[]
+}
+
+model ProductOption {
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  name      String  // Ex: "Adicional de Nozes"
+  price     Float   // Ex: 3.00
+
+  productId String  @db.ObjectId
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+// --------------------------------------
+// CLIENTES
+// --------------------------------------
+
+model User {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  phone     String   @unique
+  email     String?
+  password  String?  // Obrigatório apenas para ADMIN
+  role      Role     @default(CLIENT)
+  address   String?  
+  
+  orders    Order[]
+  createdAt DateTime @default(now())
+}
+
+// --------------------------------------
+// VENDAS (PEDIDOS)
+// --------------------------------------
+
+model Order {
+  id            String        @id @default(auto()) @map("_id") @db.ObjectId
+  userId        String        @db.ObjectId
+  user          User          @relation(fields: [userId], references: [id])
+  total         Float
+  paymentMethod PaymentMethod // Agora é tipado!
+  status        OrderStatus   @default(PENDING)
+  type          OrderType     @default(DELIVERY) // Delivery ou Pickup
+  address       String?       
+  items         OrderItem[]
+  scheduledTo   DateTime?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt 
+}
+
+model OrderItem {
+  id           String  @id @default(auto()) @map("_id") @db.ObjectId
+  orderId      String  @db.ObjectId
+  order        Order   @relation(fields: [orderId], references: [id])
+  productId    String  @db.ObjectId
+  product      Product @relation(fields: [productId], references: [id])
+  productName  String  
+  quantity     Int
+  price        Float   
+  chosenOption String? 
+  observation  String? 
+}
+

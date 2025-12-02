@@ -1,65 +1,67 @@
-import Image from "next/image";
+import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <main className="min-h-screen md:h-screen w-full bg-creme text-chocolate-900 flex flex-col md:flex-row relative overflow-y-auto md:overflow-hidden">
+
+      {/* DECORAÇÃO DE FUNDO (Fixa para não rolar junto no mobile se quiser, ou absoluta padrão) */}
+      <div className="absolute top-[-50px] left-[-50px] w-40 h-40 bg-caramelo-100 rounded-full opacity-50 blur-2xl md:w-96 md:h-96 md:top-[-100px] md:left-[-100px] pointer-events-none"></div>
+      <div className="absolute bottom-[-50px] right-[-50px] w-60 h-60 bg-chocolate-800 rounded-full opacity-5 blur-3xl md:w-[500px] md:h-[500px] pointer-events-none"></div>
+
+      {/* --- LADO ESQUERDO --- */}
+      <section className="flex-1 flex flex-col justify-center items-center relative z-10 px-6 py-10 md:px-0 md:py-0">
+
+        <div className="flex flex-col items-center md:items-start max-w-lg w-full md:pl-20">
+          {/* LOGO */}
+          <div className="w-32 h-32 bg-chocolate-900 rounded-full flex items-center justify-center shadow-xl mb-6 border-4 border-caramelo-500 md:w-40 md:h-40 shrink-0">
+            <span className="text-4xl md:text-6xl">🍫</span>
+          </div>
+
+          {/* TÍTULO */}
+          <h1 className="text-4xl md:text-6xl font-serif font-bold text-chocolate-900 tracking-wide leading-tight text-center md:text-left">
+            AMA <br className="hidden md:block" /> BROWNIE
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="text-chocolate-600 mt-4 text-lg italic md:text-xl text-center md:text-left">
+            Explosão de amor em cada pedaço.
           </p>
+
+          {/* BOTÕES */}
+          <div className="w-full max-w-xs flex flex-col space-y-4 mt-8">
+            <Link
+              href="/main"
+              className="w-full bg-chocolate-900 hover:bg-chocolate-800 text-white font-bold py-4 px-6 rounded-2xl shadow-lg transition-transform transform hover:scale-105 flex items-center justify-center gap-2"
+            >
+              <span>Ver Cardápio</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg>
+            </Link>
+
+            <Link
+              href="/login"
+              className="w-full bg-transparent hover:bg-caramelo-100 text-chocolate-900 font-bold py-4 px-6 rounded-2xl border-2 border-chocolate-900 transition-colors flex items-center justify-center"
+            >
+              Área administrativa
+            </Link>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+      </section>
+
+      {/* --- LADO DIREITO --- */}
+      <div className="hidden md:flex flex-1 items-center justify-center relative z-0">
+
+        {/* Círculo decorativo */}
+        <div className="w-[400px] h-[400px] bg-chocolate-900 rounded-full absolute opacity-10 blur-xl"></div>
+
+        {/* Card Flutuante */}
+        <div className="relative w-full max-w-[400px] aspect-square lg:max-w-[450px] bg-gradient-to-br from-chocolate-800 to-chocolate-600 rounded-3xl shadow-2xl rotate-6 flex items-center justify-center border-8 border-white transition-transform hover:rotate-3 mx-4">
+          <span className="text-9xl opacity-50 select-none">🍰</span>
+          <div className="absolute bottom-10 -left-10 bg-white p-4 rounded-xl shadow-lg rotate-[-6deg]">
+            <p className="font-serif font-bold text-chocolate-900">100% Cacau</p>
+            <p className="text-xs text-gray-500">Qualidade Premium</p>
+          </div>
         </div>
-      </main>
-    </div>
+      </div>
+
+    </main>
   );
 }

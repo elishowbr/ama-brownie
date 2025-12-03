@@ -36,7 +36,6 @@ async function main() {
             description: 'Massa densa 70% cacau com pedaços de nozes nobres.',
             price: 12.90,
             categoryId: catTradicionais.id,
-            tags: ['Mais Vendido'],
             imageUrl: '/brownie-1.jpg',
             options: {
                 create: [

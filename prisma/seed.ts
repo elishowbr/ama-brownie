@@ -54,7 +54,6 @@ async function main() {
             price: 25.00,       // Preço "De" (Riscado)
             promoPrice: 19.90,  // Preço "Por" (Verde)
             categoryId: catRecheados.id,
-            tags: ['Oferta Relâmpago', 'Imperdível'],
             imageUrl: '/brownie-2.jpg',
             options: {
                 create: [

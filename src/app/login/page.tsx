@@ -38,6 +38,26 @@ export default function LoginPage() {
         }
     };
 
+        const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        let value = e.target.value.replace(/\D/g, ""); // Remove tudo que não é número
+
+        // Limita a 11 dígitos
+        if (value.length > 11) value = value.slice(0, 11);
+
+        // Aplica a máscara (XX) XXXXX-XXXX
+        if (value.length > 2) {
+            value = `(${value.slice(0, 2)}) ${value.slice(2)}`;
+        }
+        if (value.length > 10) {
+            value = `${value.slice(0, 10)}-${value.slice(10)}`;
+        } else if (value.length > 6) { // Ajuste para números fixos ou móveis incompletos
+            value = `${value.slice(0, 9)}-${value.slice(9)}`;
+        }
+
+        setPhone(value);
+
+    };
+
     return (
         <div className="min-h-screen bg-creme flex items-center justify-center p-4">
             <div className="bg-white w-full max-w-sm p-8 rounded-3xl shadow-xl border border-caramelo-100 animate-zoomIn">
@@ -62,7 +82,7 @@ export default function LoginPage() {
                             placeholder="5511999999999"
                             className="w-full p-4 bg-gray-50 border-gray-200 focus:bg-white"
                             value={phone}
-                            onChange={(e) => setPhone(e.target.value)}
+                            onChange={(e) => { setPhone(e.target.value); handlePhoneChange(e); }}
                         />
                     </div>
 

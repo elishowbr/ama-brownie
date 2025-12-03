@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { Trash2, Plus, Save, ArrowLeft, Loader2, AlertCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { getCategories, createProduct } from "@/app/actions/admin"; 
+import { getCategories, createProduct } from "@/app/actions/admin";
 
 interface Category {
     id: string;
@@ -32,6 +32,7 @@ export default function NewProductPage() {
         imageUrl: "",
     });
 
+    const [flavors, setFlavors] = useState<ProductOptionItem[]>([]);
     const [options, setOptions] = useState<ProductOptionItem[]>([]);
 
     useEffect(() => {
@@ -47,7 +48,7 @@ export default function NewProductPage() {
     ) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
-        
+
         if (fieldErrors[name]) {
             setFieldErrors(prev => {
                 const newErrors = { ...prev };
@@ -79,17 +80,29 @@ export default function NewProductPage() {
         setOptions(newOptions);
     };
 
+    const addFlavor = () => setFlavors([...flavors, { name: "", price: 0 }]);
+    const removeFlavor = (index: number) => setFlavors(flavors.filter((_, i) => i !== index));
+    const updateFlavor = (index: number, field: keyof ProductOptionItem, value: string | number) => {
+        const newFlavors = [...flavors];
+        newFlavors[index] = {
+            ...newFlavors[index],
+            [field]: field === "price" ? parseFloat(value.toString()) || 0 : value
+        };
+        setFlavors(newFlavors);
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
-        setFieldErrors({}); 
+        setFieldErrors({});
 
         try {
             const payload = {
                 ...formData,
-                price: parseFloat(formData.price), 
+                price: parseFloat(formData.price),
                 promoPrice: formData.promoPrice ? parseFloat(formData.promoPrice) : null,
                 options: options.filter((opt) => opt.name.trim() !== ""),
+                flavors: flavors.filter(flav => flav.name.trim() !== "")
             };
 
             const result = await createProduct(payload);
@@ -259,6 +272,34 @@ export default function NewProductPage() {
                                 />
                             </div>
                         </div>
+                    </div>
+
+                    {/* --- NOVO BLOCO: SABORES --- */}
+                    <div className="bg-white rounded-xl shadow-sm border border-amber-100 p-6 mb-6">
+                        <div className="flex justify-between items-center mb-4 border-b border-amber-100 pb-2">
+                            <div>
+                                <h2 className="text-xl font-semibold text-amber-900">Sabores</h2>
+                                <p className="text-xs text-gray-500">Ex: Nutella, Doce de Leite. Se vazio, será "Tradicional".</p>
+                            </div>
+                            <button type="button" onClick={addFlavor} className="text-sm bg-amber-100 text-amber-900 px-3 py-1 rounded hover:bg-amber-200">
+                                + Adicionar
+                            </button>
+                        </div>
+
+                        {flavors.map((item, index) => (
+                            <div key={index} className="flex gap-4 mb-3 items-end">
+                                <div className="flex-1">
+                                    <label className="text-xs text-gray-500">Nome do Sabor</label>
+                                    <input type="text" value={item.name} onChange={e => updateFlavor(index, 'name', e.target.value)} className="w-full border rounded p-2 text-sm" placeholder="Ex: Chocolate Belga" />
+                                </div>
+                                <div className="w-32">
+                                    <label className="text-xs text-gray-500">Preço Extra</label>
+                                    <input type="number" step="0.01" value={item.price} onChange={e => updateFlavor(index, 'price', e.target.value)} className="w-full border rounded p-2 text-sm" />
+                                </div>
+                                <button type="button" onClick={() => removeFlavor(index)} className="p-2 text-red-400 hover:text-red-600"><Trash2 className="w-5 h-5" /></button>
+                            </div>
+                        ))}
+                        {flavors.length === 0 && <p className="text-sm text-gray-400 italic text-center py-2">Nenhum sabor específico (Produto Tradicional)</p>}
                     </div>
 
                     {/* Opções */}

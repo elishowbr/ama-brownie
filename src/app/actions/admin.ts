@@ -23,6 +23,10 @@ const productSchema = z.object({
     options: z.array(z.object({
         name: z.string(),
         price: z.coerce.number()
+    })).optional(),
+    flavors: z.array(z.object({
+        name: z.string(),
+        price: z.coerce.number()
     })).optional()
 });
 
@@ -54,8 +58,9 @@ export async function createCategory(data: any) {
 
     try {
         await prisma.category.create({
-            data : { name: validation.data.name ,
-                slug : validation.data.name.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '')
+            data: {
+                name: validation.data.name,
+                slug: validation.data.name.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '')
             },
         });
 
@@ -103,7 +108,8 @@ export async function getProducts() {
             orderBy: { createdAt: 'desc' },
             include: {
                 category: true,
-                options: true
+                options: true,
+                flavors: true
             }
         });
         return products;
@@ -120,7 +126,7 @@ export async function getProductById(id: string) {
     try {
         return await prisma.product.findUnique({
             where: { id },
-            include: { options: true }
+            include: { options: true, flavors: true }
         });
     } catch (error) {
         return null;
@@ -134,7 +140,7 @@ export async function createProduct(data: any) {
     const validation = productSchema.safeParse(data);
     if (!validation.success) return { error: validation.error.flatten().fieldErrors };
 
-    const { name, description, price, promoPrice, imageUrl, categoryId, options } = validation.data;
+    const { name, description, price, promoPrice, imageUrl, categoryId, options, flavors } = validation.data;
 
     try {
         await prisma.product.create({
@@ -148,6 +154,9 @@ export async function createProduct(data: any) {
                 category: { connect: { id: categoryId } },
                 options: {
                     create: options?.map(opt => ({ name: opt.name, price: opt.price })) || []
+                },
+                flavors: {
+                    create: flavors?.map(flav => ({ name: flav.name, price: flav.price })) || []
                 }
             }
         });
@@ -169,7 +178,7 @@ export async function updateProduct(id: string, data: any) {
     const validation = productSchema.safeParse(data);
     if (!validation.success) return { error: validation.error.flatten().fieldErrors };
 
-    const { name, description, price, promoPrice, imageUrl, categoryId, options } = validation.data;
+    const { name, description, price, promoPrice, imageUrl, categoryId, options, flavors } = validation.data;
 
     try {
         await prisma.product.update({
@@ -184,6 +193,10 @@ export async function updateProduct(id: string, data: any) {
                 options: {
                     deleteMany: {},
                     create: options?.map(opt => ({ name: opt.name, price: opt.price })) || []
+                },
+                flavors: {
+                    deleteMany: {},
+                    create: flavors?.map((flav) => ({ name: flav.name, price: flav.price })) || []
                 }
             }
         });

@@ -58,8 +58,8 @@ model Product {
   categoryId  String          @db.ObjectId
   category    Category        @relation(fields: [categoryId], references: [id])
   
-  tags        String[]
   options     ProductOption[]
+  flavors     ProductFlavor[]
   
   isAvailable Boolean         @default(true)
   createdAt   DateTime        @default(now())
@@ -77,6 +77,14 @@ model ProductOption {
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
 
+model ProductFlavor {
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  name     String
+  price    Float    @default(0)
+
+  productId String @db.ObjectId
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
 // --------------------------------------
 // CLIENTES
 // --------------------------------------
@@ -121,7 +129,8 @@ model OrderItem {
   product      Product @relation(fields: [productId], references: [id])
   productName  String  
   quantity     Int
-  price        Float   
+  price        Float
+  chosenFlavor String?   
   chosenOption String? 
   observation  String? 
 }

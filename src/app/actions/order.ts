@@ -3,8 +3,6 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/prisma";
-
-
 import { OrderType, PaymentMethod, OrderStatus } from "@/../generated/prisma"
 
 interface CreateOrderData {
@@ -70,6 +68,7 @@ export async function createOrder(data: CreateOrderData) {
                         price: item.price,
                         // Mapeamento correto dos nomes do Schema
                         chosenOption: item.opcao || null,      // Schema: chosenOption
+                        chosenFlavor: item.flavor || null,      // Schema: chosenFlavor
                         observation: item.observacao || null   // Schema: observation
                     }))
                 }

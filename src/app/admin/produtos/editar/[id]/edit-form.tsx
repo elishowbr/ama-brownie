@@ -22,6 +22,7 @@ interface ProductData {
     imageUrl: string | null;
     categoryId: string;
     options: ProductOption[];
+    flavors: ProductOption[];
 }
 
 interface Category {
@@ -53,6 +54,9 @@ export default function EditProductForm({ product, categories }: EditProductForm
     // Inicializa as opções vindas do banco
     const [options, setOptions] = useState<ProductOption[]>(
         product.options.map(opt => ({ name: opt.name, price: opt.price }))
+    );
+    const [flavors, setFlavors] = useState<ProductOption[]>(
+        product.flavors.map(flav => ({ name: flav.name, price: flav.price }))
     );
 
     const handleChange = (
@@ -87,6 +91,24 @@ export default function EditProductForm({ product, categories }: EditProductForm
         setOptions(newOptions);
     };
 
+    const addFlavor = () => {
+        setFlavors([...flavors, { name: "", price: 0 }]);
+    };
+
+    const removeFlavor = (index: number) => {
+        const newFlavors = flavors.filter((_, i) => i !== index);
+        setFlavors(newFlavors);
+    };
+
+    const updateFlavorState = (index: number, field: keyof ProductOption, value: string | number) => {
+        const newFlavors = [...flavors];
+        newFlavors[index] = {
+            ...newFlavors[index],
+            [field]: field === "price" ? parseFloat(value.toString()) || 0 : value,
+        };
+        setFlavors(newFlavors);
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
@@ -98,6 +120,7 @@ export default function EditProductForm({ product, categories }: EditProductForm
                 price: parseFloat(formData.price),
                 promoPrice: formData.promoPrice ? parseFloat(formData.promoPrice) : null,
                 options: options.filter((opt) => opt.name.trim() !== ""),
+                flavors: flavors.filter((flav) => flav.name.trim() !== ""),
             };
 
             // CHAMADA À SERVER ACTION DE UPDATE
@@ -215,6 +238,34 @@ export default function EditProductForm({ product, categories }: EditProductForm
                                 className="w-full rounded-lg border-amber-200 bg-amber-50/30 focus:border-amber-500 p-2.5 text-gray-800" />
                         </div>
                     </div>
+                </div>
+
+                {/* --- NOVO BLOCO: SABORES --- */}
+                <div className="bg-white rounded-xl shadow-sm border border-amber-100 p-6 mb-6">
+                    <div className="flex justify-between items-center mb-4 border-b border-amber-100 pb-2">
+                        <div>
+                            <h2 className="text-xl font-semibold text-amber-900">Sabores</h2>
+                            <p className="text-xs text-gray-500">Ex: Nutella, Doce de Leite. Se vazio, será "Tradicional".</p>
+                        </div>
+                        <button type="button" onClick={addFlavor} className="text-sm bg-amber-100 text-amber-900 px-3 py-1 rounded hover:bg-amber-200">
+                            + Adicionar
+                        </button>
+                    </div>
+
+                    {flavors.map((item, index) => (
+                        <div key={index} className="flex gap-4 mb-3 items-end">
+                            <div className="flex-1">
+                                <label className="text-xs text-gray-500">Nome do Sabor</label>
+                                <input type="text" value={item.name} onChange={e => updateFlavorState(index, 'name', e.target.value)} className="w-full border rounded p-2 text-sm" placeholder="Ex: Chocolate Belga" />
+                            </div>
+                            <div className="w-32">
+                                <label className="text-xs text-gray-500">Preço Extra</label>
+                                <input type="number" step="0.01" value={item.price} onChange={e => updateFlavorState(index, 'price', e.target.value)} className="w-full border rounded p-2 text-sm" />
+                            </div>
+                            <button type="button" onClick={() => removeFlavor(index)} className="p-2 text-red-400 hover:text-red-600"><Trash2 className="w-5 h-5" /></button>
+                        </div>
+                    ))}
+                    {flavors.length === 0 && <p className="text-sm text-gray-400 italic text-center py-2">Nenhum sabor específico (Produto Tradicional)</p>}
                 </div>
 
                 {/* CARD OPÇÕES */}

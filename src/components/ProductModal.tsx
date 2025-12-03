@@ -19,7 +19,8 @@ interface Produto {
     price: number;
     promoPrice?: number | null;
     imageUrl?: string | null;
-    options?: ProductOption[];
+    options?: ProductOption[]; // Adicionais / Tamanhos
+    flavors?: ProductOption[]; // Sabores
 }
 
 interface ProductModalProps {
@@ -31,33 +32,30 @@ interface ProductModalProps {
 export default function ProductModal({ produto, isOpen, onClose }: ProductModalProps) {
     const [quantidade, setQuantidade] = useState(1);
     const [observacao, setObservacao] = useState("");
-    // Inicia sempre como null (nenhuma opção selecionada)
-    const [opcaoEscolhida, setOpcaoEscolhida] = useState<ProductOption | null>(null);
+
+    // --- ESTADOS SEPARADOS (CORREÇÃO) ---
+    const [saborEscolhido, setSaborEscolhido] = useState<ProductOption | null>(null);
+    const [opcaoEscolhida, setOpcaoEscolhida] = useState<ProductOption | null>(null); // Estado separado para opção
 
     const { addToCart } = useCart();
 
     // --- 1. INICIALIZAÇÃO ---
-    // Resetar estados quando o modal abre ou o produto muda
     useEffect(() => {
         if (isOpen && produto) {
             setQuantidade(1);
             setObservacao("");
-            // MUDANÇA AQUI: Sempre inicia sem nenhuma opção marcada, mesmo que existam opções.
+
+            // Lógica de Sabor (Seleciona 1º automático)
+            if (produto.flavors && produto.flavors.length > 0) {
+                setSaborEscolhido(produto.flavors[0]);
+            } else {
+                setSaborEscolhido(null);
+            }
+
+            // Lógica de Opção (Reseta para null)
             setOpcaoEscolhida(null);
         }
     }, [isOpen, produto]);
-
-    // --- 2. NOVA LÓGICA DE SELEÇÃO (TOGGLE) ---
-    const handleSelectOption = (opcao: ProductOption) => {
-        // Se a opção clicada JÁ É a escolhida...
-        if (opcaoEscolhida?.id === opcao.id) {
-            // ...desmarca ela (torna opcional)
-            setOpcaoEscolhida(null);
-        } else {
-            // Caso contrário, marca a nova opção
-            setOpcaoEscolhida(opcao);
-        }
-    };
 
     if (!isOpen || !produto) return null;
 
@@ -68,23 +66,31 @@ export default function ProductModal({ produto, isOpen, onClose }: ProductModalP
 
     const isOnSale = (produto.promoPrice !== null && produto.promoPrice !== undefined) && produto.promoPrice < produto.price;
 
-    // Se não tiver opção escolhida, o preço adicional é 0
-    const optionPrice = opcaoEscolhida ? Number(opcaoEscolhida.price) : 0;
-    const unitPrice = basePrice + optionPrice;
+    const flavorPrice = saborEscolhido ? Number(saborEscolhido.price) : 0;
+    const optionPrice = opcaoEscolhida ? Number(opcaoEscolhida.price) : 0; // Preço da opção separado
+
+    const unitPrice = basePrice + flavorPrice + optionPrice; // Soma tudo
     const totalPrice = unitPrice * quantidade;
 
     const handleConfirm = () => {
+        // Formata o texto da opção para exibir no carrinho (ex: "Tamanho G (+ R$ 5,00)")
+        const textoOpcao = opcaoEscolhida
+            ? `${opcaoEscolhida.name} ${opcaoEscolhida.price > 0 ? `(+ ${formatCurrency(opcaoEscolhida.price)})` : ''}`
+            : undefined;
+
         addToCart({
             id: produto.id,
-            tempId: `${produto.id}-${opcaoEscolhida?.id || 'padrao'}-${Date.now()}`,
+            // O ID temporário agora considera Sabor E Opção para ser único
+            tempId: `${produto.id}-${saborEscolhido?.id || 'std'}-${opcaoEscolhida?.id || 'std'}-${Date.now()}`,
             name: produto.name,
             price: unitPrice,
             quantity: quantidade,
             image: produto.imageUrl || null,
             observacao: observacao,
-            opcao: opcaoEscolhida
-                ? `${opcaoEscolhida.name} ${opcaoEscolhida.price > 0 ? `(+ ${formatCurrency(opcaoEscolhida.price)})` : ''}`
-                : undefined
+
+            // Envia os dados separadamente para o Contexto
+            flavor: saborEscolhido?.name,
+            opcao: textoOpcao,
         });
         onClose();
     };
@@ -95,13 +101,11 @@ export default function ProductModal({ produto, isOpen, onClose }: ProductModalP
 
     return (
         <div className="fixed inset-0 z-[999] flex justify-center items-end md:items-center p-0 md:p-4">
-            {/* Backdrop */}
             <div
                 className="absolute inset-0 bg-chocolate-900/80 backdrop-blur-sm transition-opacity"
                 onClick={onClose}
             ></div>
 
-            {/* Modal Card */}
             <div className="
                 relative bg-white flex flex-col overflow-hidden shadow-2xl
                 w-full h-[90vh] md:h-auto md:max-h-[90vh] md:max-w-[500px]
@@ -113,11 +117,10 @@ export default function ProductModal({ produto, isOpen, onClose }: ProductModalP
                 <div className="relative h-56 w-full bg-gray-100 shrink-0">
                     {produto.imageUrl ? (
                         <Image
-                            width={500}
-                            height={300}
+                            fill
                             src={produto.imageUrl}
                             alt={produto.name}
-                            className="w-full h-full object-cover"
+                            className="object-cover"
                         />
                     ) : (
                         <div className="w-full h-full flex flex-col items-center justify-center bg-amber-50 text-amber-800/40">
@@ -168,48 +171,41 @@ export default function ProductModal({ produto, isOpen, onClose }: ProductModalP
 
                     <hr className="border-gray-100" />
 
-                    {/* --- SEÇÃO DE OPÇÕES OPCIONAIS --- */}
-                    {produto.options && produto.options.length > 0 && (
-                        <div className="space-y-3">
-                            <div className="flex items-center gap-2">
-                                <h4 className="font-bold text-gray-400 text-xs uppercase tracking-widest">
-                                    Adicionais (Opcional)
-                                </h4>
-                            </div>
-
+                    {/* --- 1. ESCOLHA DE SABOR (Rádio Obrigatório) --- */}
+                    {produto.flavors && produto.flavors.length > 0 && (
+                        <div className="space-y-3 mb-6">
+                            <h4 className="font-bold text-gray-700 text-sm">Escolha o Sabor</h4>
                             <div className="flex flex-col gap-2">
-                                {produto.options.map((opcao) => {
-                                    const isSelected = opcaoEscolhida?.id === opcao.id;
-                                    return (
-                                        // Usamos uma div com onClick para fazer o "toggle"
-                                        <div
-                                            key={opcao.id}
-                                            onClick={() => handleSelectOption(opcao)}
-                                            className={`
-                                                relative flex items-center justify-between p-3 rounded-xl border-2 cursor-pointer transition-all select-none
-                                                ${isSelected
-                                                    ? 'border-chocolate-900 bg-caramelo-50/30 shadow-sm'
-                                                    : 'border-gray-100 hover:border-caramelo-200 bg-white'}
-                                            `}
-                                        >
-                                            <div className="flex items-center gap-3">
-                                                {/* Visual do "Rádio" que marca/desmarca */}
-                                                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${isSelected ? 'border-chocolate-900' : 'border-gray-300'}`}>
-                                                    {isSelected && <div className="w-2.5 h-2.5 bg-chocolate-900 rounded-full"></div>}
-                                                </div>
-                                                <span className={`font-medium text-sm ${isSelected ? 'text-chocolate-900' : 'text-gray-600'}`}>
-                                                    {opcao.name}
-                                                </span>
-                                            </div>
+                                {produto.flavors.map(sabor => (
+                                    <div
+                                        key={sabor.id}
+                                        onClick={() => setSaborEscolhido(sabor)} // Atualiza APENAS o sabor
+                                        className={`p-3 border-2 rounded-xl cursor-pointer flex justify-between ${saborEscolhido?.id === sabor.id ? 'border-chocolate-900 bg-amber-50' : 'border-gray-100'}`}
+                                    >
+                                        <span className="font-medium text-chocolate-900">{sabor.name}</span>
+                                        {sabor.price > 0 && <span className="text-green-700 font-bold text-xs">+ {formatCurrency(sabor.price)}</span>}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
 
-                                            {opcao.price > 0 && (
-                                                <span className={`text-xs font-bold px-2 py-1 rounded-md ${isSelected ? 'text-green-700 bg-green-50' : 'text-gray-500 bg-gray-50'}`}>
-                                                    + {formatCurrency(opcao.price)}
-                                                </span>
-                                            )}
-                                        </div>
-                                    );
-                                })}
+                    {/* --- 2. ESCOLHA DE OPÇÃO/ADICIONAL (Toggle Opcional) --- */}
+                    {produto.options && produto.options.length > 0 && (
+                        <div className="space-y-3 mb-6">
+                            <h4 className="font-bold text-gray-700 text-sm">Adicionais / Tamanho</h4>
+                            <div className="flex flex-col gap-2">
+                                {produto.options.map(opt => (
+                                    <div
+                                        key={opt.id}
+                                        // CORREÇÃO: Atualiza APENAS a opção (Toggle)
+                                        onClick={() => setOpcaoEscolhida(prev => prev?.id === opt.id ? null : opt)}
+                                        className={`p-3 border-2 rounded-xl cursor-pointer flex justify-between ${opcaoEscolhida?.id === opt.id ? 'border-chocolate-900 bg-amber-50' : 'border-gray-100'}`}
+                                    >
+                                        <span className="font-medium text-chocolate-900">{opt.name}</span>
+                                        {opt.price > 0 && <span className="text-green-700 font-bold text-xs">+ {formatCurrency(opt.price)}</span>}
+                                    </div>
+                                ))}
                             </div>
                         </div>
                     )}

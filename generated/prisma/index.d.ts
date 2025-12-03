@@ -29,6 +29,11 @@ export type Product = $Result.DefaultSelection<Prisma.$ProductPayload>
  */
 export type ProductOption = $Result.DefaultSelection<Prisma.$ProductOptionPayload>
 /**
+ * Model ProductFlavor
+ * 
+ */
+export type ProductFlavor = $Result.DefaultSelection<Prisma.$ProductFlavorPayload>
+/**
  * Model User
  * 
  */
@@ -222,6 +227,16 @@ export class PrismaClient<
     * ```
     */
   get productOption(): Prisma.ProductOptionDelegate<ExtArgs>;
+
+  /**
+   * `prisma.productFlavor`: Exposes CRUD operations for the **ProductFlavor** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more ProductFlavors
+    * const productFlavors = await prisma.productFlavor.findMany()
+    * ```
+    */
+  get productFlavor(): Prisma.ProductFlavorDelegate<ExtArgs>;
 
   /**
    * `prisma.user`: Exposes CRUD operations for the **User** model.
@@ -694,6 +709,7 @@ export namespace Prisma {
     Category: 'Category',
     Product: 'Product',
     ProductOption: 'ProductOption',
+    ProductFlavor: 'ProductFlavor',
     User: 'User',
     Order: 'Order',
     OrderItem: 'OrderItem'
@@ -712,7 +728,7 @@ export namespace Prisma {
 
   export type TypeMap<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> = {
     meta: {
-      modelProps: "category" | "product" | "productOption" | "user" | "order" | "orderItem"
+      modelProps: "category" | "product" | "productOption" | "productFlavor" | "user" | "order" | "orderItem"
       txIsolationLevel: never
     }
     model: {
@@ -935,6 +951,80 @@ export namespace Prisma {
           count: {
             args: Prisma.ProductOptionCountArgs<ExtArgs>
             result: $Utils.Optional<ProductOptionCountAggregateOutputType> | number
+          }
+        }
+      }
+      ProductFlavor: {
+        payload: Prisma.$ProductFlavorPayload<ExtArgs>
+        fields: Prisma.ProductFlavorFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ProductFlavorFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductFlavorPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ProductFlavorFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductFlavorPayload>
+          }
+          findFirst: {
+            args: Prisma.ProductFlavorFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductFlavorPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ProductFlavorFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductFlavorPayload>
+          }
+          findMany: {
+            args: Prisma.ProductFlavorFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductFlavorPayload>[]
+          }
+          create: {
+            args: Prisma.ProductFlavorCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductFlavorPayload>
+          }
+          createMany: {
+            args: Prisma.ProductFlavorCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.ProductFlavorDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductFlavorPayload>
+          }
+          update: {
+            args: Prisma.ProductFlavorUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductFlavorPayload>
+          }
+          deleteMany: {
+            args: Prisma.ProductFlavorDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ProductFlavorUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.ProductFlavorUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductFlavorPayload>
+          }
+          aggregate: {
+            args: Prisma.ProductFlavorAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateProductFlavor>
+          }
+          groupBy: {
+            args: Prisma.ProductFlavorGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ProductFlavorGroupByOutputType>[]
+          }
+          findRaw: {
+            args: Prisma.ProductFlavorFindRawArgs<ExtArgs>
+            result: JsonObject
+          }
+          aggregateRaw: {
+            args: Prisma.ProductFlavorAggregateRawArgs<ExtArgs>
+            result: JsonObject
+          }
+          count: {
+            args: Prisma.ProductFlavorCountArgs<ExtArgs>
+            result: $Utils.Optional<ProductFlavorCountAggregateOutputType> | number
           }
         }
       }
@@ -1340,11 +1430,13 @@ export namespace Prisma {
 
   export type ProductCountOutputType = {
     options: number
+    flavors: number
     orderItems: number
   }
 
   export type ProductCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     options?: boolean | ProductCountOutputTypeCountOptionsArgs
+    flavors?: boolean | ProductCountOutputTypeCountFlavorsArgs
     orderItems?: boolean | ProductCountOutputTypeCountOrderItemsArgs
   }
 
@@ -1364,6 +1456,13 @@ export namespace Prisma {
    */
   export type ProductCountOutputTypeCountOptionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: ProductOptionWhereInput
+  }
+
+  /**
+   * ProductCountOutputType without action
+   */
+  export type ProductCountOutputTypeCountFlavorsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ProductFlavorWhereInput
   }
 
   /**
@@ -2425,7 +2524,6 @@ export namespace Prisma {
     price: number
     promoPrice: number
     categoryId: number
-    tags: number
     isAvailable: number
     createdAt: number
     updatedAt: number
@@ -2477,7 +2575,6 @@ export namespace Prisma {
     price?: true
     promoPrice?: true
     categoryId?: true
-    tags?: true
     isAvailable?: true
     createdAt?: true
     updatedAt?: true
@@ -2578,7 +2675,6 @@ export namespace Prisma {
     price: number
     promoPrice: number | null
     categoryId: string
-    tags: string[]
     isAvailable: boolean
     createdAt: Date
     updatedAt: Date
@@ -2611,12 +2707,12 @@ export namespace Prisma {
     price?: boolean
     promoPrice?: boolean
     categoryId?: boolean
-    tags?: boolean
     isAvailable?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     category?: boolean | CategoryDefaultArgs<ExtArgs>
     options?: boolean | Product$optionsArgs<ExtArgs>
+    flavors?: boolean | Product$flavorsArgs<ExtArgs>
     orderItems?: boolean | Product$orderItemsArgs<ExtArgs>
     _count?: boolean | ProductCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["product"]>
@@ -2630,7 +2726,6 @@ export namespace Prisma {
     price?: boolean
     promoPrice?: boolean
     categoryId?: boolean
-    tags?: boolean
     isAvailable?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -2639,6 +2734,7 @@ export namespace Prisma {
   export type ProductInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     category?: boolean | CategoryDefaultArgs<ExtArgs>
     options?: boolean | Product$optionsArgs<ExtArgs>
+    flavors?: boolean | Product$flavorsArgs<ExtArgs>
     orderItems?: boolean | Product$orderItemsArgs<ExtArgs>
     _count?: boolean | ProductCountOutputTypeDefaultArgs<ExtArgs>
   }
@@ -2648,6 +2744,7 @@ export namespace Prisma {
     objects: {
       category: Prisma.$CategoryPayload<ExtArgs>
       options: Prisma.$ProductOptionPayload<ExtArgs>[]
+      flavors: Prisma.$ProductFlavorPayload<ExtArgs>[]
       orderItems: Prisma.$OrderItemPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
@@ -2658,7 +2755,6 @@ export namespace Prisma {
       price: number
       promoPrice: number | null
       categoryId: string
-      tags: string[]
       isAvailable: boolean
       createdAt: Date
       updatedAt: Date
@@ -3027,6 +3123,7 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     category<T extends CategoryDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CategoryDefaultArgs<ExtArgs>>): Prisma__CategoryClient<$Result.GetResult<Prisma.$CategoryPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
     options<T extends Product$optionsArgs<ExtArgs> = {}>(args?: Subset<T, Product$optionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProductOptionPayload<ExtArgs>, T, "findMany"> | Null>
+    flavors<T extends Product$flavorsArgs<ExtArgs> = {}>(args?: Subset<T, Product$flavorsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProductFlavorPayload<ExtArgs>, T, "findMany"> | Null>
     orderItems<T extends Product$orderItemsArgs<ExtArgs> = {}>(args?: Subset<T, Product$orderItemsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OrderItemPayload<ExtArgs>, T, "findMany"> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -3064,7 +3161,6 @@ export namespace Prisma {
     readonly price: FieldRef<"Product", 'Float'>
     readonly promoPrice: FieldRef<"Product", 'Float'>
     readonly categoryId: FieldRef<"Product", 'String'>
-    readonly tags: FieldRef<"Product", 'String[]'>
     readonly isAvailable: FieldRef<"Product", 'Boolean'>
     readonly createdAt: FieldRef<"Product", 'DateTime'>
     readonly updatedAt: FieldRef<"Product", 'DateTime'>
@@ -3411,6 +3507,26 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: ProductOptionScalarFieldEnum | ProductOptionScalarFieldEnum[]
+  }
+
+  /**
+   * Product.flavors
+   */
+  export type Product$flavorsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductFlavor
+     */
+    select?: ProductFlavorSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProductFlavorInclude<ExtArgs> | null
+    where?: ProductFlavorWhereInput
+    orderBy?: ProductFlavorOrderByWithRelationInput | ProductFlavorOrderByWithRelationInput[]
+    cursor?: ProductFlavorWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ProductFlavorScalarFieldEnum | ProductFlavorScalarFieldEnum[]
   }
 
   /**
@@ -4397,6 +4513,958 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: ProductOptionInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model ProductFlavor
+   */
+
+  export type AggregateProductFlavor = {
+    _count: ProductFlavorCountAggregateOutputType | null
+    _avg: ProductFlavorAvgAggregateOutputType | null
+    _sum: ProductFlavorSumAggregateOutputType | null
+    _min: ProductFlavorMinAggregateOutputType | null
+    _max: ProductFlavorMaxAggregateOutputType | null
+  }
+
+  export type ProductFlavorAvgAggregateOutputType = {
+    price: number | null
+  }
+
+  export type ProductFlavorSumAggregateOutputType = {
+    price: number | null
+  }
+
+  export type ProductFlavorMinAggregateOutputType = {
+    id: string | null
+    name: string | null
+    price: number | null
+    productId: string | null
+  }
+
+  export type ProductFlavorMaxAggregateOutputType = {
+    id: string | null
+    name: string | null
+    price: number | null
+    productId: string | null
+  }
+
+  export type ProductFlavorCountAggregateOutputType = {
+    id: number
+    name: number
+    price: number
+    productId: number
+    _all: number
+  }
+
+
+  export type ProductFlavorAvgAggregateInputType = {
+    price?: true
+  }
+
+  export type ProductFlavorSumAggregateInputType = {
+    price?: true
+  }
+
+  export type ProductFlavorMinAggregateInputType = {
+    id?: true
+    name?: true
+    price?: true
+    productId?: true
+  }
+
+  export type ProductFlavorMaxAggregateInputType = {
+    id?: true
+    name?: true
+    price?: true
+    productId?: true
+  }
+
+  export type ProductFlavorCountAggregateInputType = {
+    id?: true
+    name?: true
+    price?: true
+    productId?: true
+    _all?: true
+  }
+
+  export type ProductFlavorAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ProductFlavor to aggregate.
+     */
+    where?: ProductFlavorWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ProductFlavors to fetch.
+     */
+    orderBy?: ProductFlavorOrderByWithRelationInput | ProductFlavorOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ProductFlavorWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ProductFlavors from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ProductFlavors.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned ProductFlavors
+    **/
+    _count?: true | ProductFlavorCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: ProductFlavorAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: ProductFlavorSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ProductFlavorMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ProductFlavorMaxAggregateInputType
+  }
+
+  export type GetProductFlavorAggregateType<T extends ProductFlavorAggregateArgs> = {
+        [P in keyof T & keyof AggregateProductFlavor]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateProductFlavor[P]>
+      : GetScalarType<T[P], AggregateProductFlavor[P]>
+  }
+
+
+
+
+  export type ProductFlavorGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ProductFlavorWhereInput
+    orderBy?: ProductFlavorOrderByWithAggregationInput | ProductFlavorOrderByWithAggregationInput[]
+    by: ProductFlavorScalarFieldEnum[] | ProductFlavorScalarFieldEnum
+    having?: ProductFlavorScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ProductFlavorCountAggregateInputType | true
+    _avg?: ProductFlavorAvgAggregateInputType
+    _sum?: ProductFlavorSumAggregateInputType
+    _min?: ProductFlavorMinAggregateInputType
+    _max?: ProductFlavorMaxAggregateInputType
+  }
+
+  export type ProductFlavorGroupByOutputType = {
+    id: string
+    name: string
+    price: number
+    productId: string
+    _count: ProductFlavorCountAggregateOutputType | null
+    _avg: ProductFlavorAvgAggregateOutputType | null
+    _sum: ProductFlavorSumAggregateOutputType | null
+    _min: ProductFlavorMinAggregateOutputType | null
+    _max: ProductFlavorMaxAggregateOutputType | null
+  }
+
+  type GetProductFlavorGroupByPayload<T extends ProductFlavorGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ProductFlavorGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ProductFlavorGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ProductFlavorGroupByOutputType[P]>
+            : GetScalarType<T[P], ProductFlavorGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ProductFlavorSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    price?: boolean
+    productId?: boolean
+    product?: boolean | ProductDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["productFlavor"]>
+
+
+  export type ProductFlavorSelectScalar = {
+    id?: boolean
+    name?: boolean
+    price?: boolean
+    productId?: boolean
+  }
+
+  export type ProductFlavorInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    product?: boolean | ProductDefaultArgs<ExtArgs>
+  }
+
+  export type $ProductFlavorPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "ProductFlavor"
+    objects: {
+      product: Prisma.$ProductPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      name: string
+      price: number
+      productId: string
+    }, ExtArgs["result"]["productFlavor"]>
+    composites: {}
+  }
+
+  type ProductFlavorGetPayload<S extends boolean | null | undefined | ProductFlavorDefaultArgs> = $Result.GetResult<Prisma.$ProductFlavorPayload, S>
+
+  type ProductFlavorCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<ProductFlavorFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: ProductFlavorCountAggregateInputType | true
+    }
+
+  export interface ProductFlavorDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['ProductFlavor'], meta: { name: 'ProductFlavor' } }
+    /**
+     * Find zero or one ProductFlavor that matches the filter.
+     * @param {ProductFlavorFindUniqueArgs} args - Arguments to find a ProductFlavor
+     * @example
+     * // Get one ProductFlavor
+     * const productFlavor = await prisma.productFlavor.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ProductFlavorFindUniqueArgs>(args: SelectSubset<T, ProductFlavorFindUniqueArgs<ExtArgs>>): Prisma__ProductFlavorClient<$Result.GetResult<Prisma.$ProductFlavorPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one ProductFlavor that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {ProductFlavorFindUniqueOrThrowArgs} args - Arguments to find a ProductFlavor
+     * @example
+     * // Get one ProductFlavor
+     * const productFlavor = await prisma.productFlavor.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ProductFlavorFindUniqueOrThrowArgs>(args: SelectSubset<T, ProductFlavorFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ProductFlavorClient<$Result.GetResult<Prisma.$ProductFlavorPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first ProductFlavor that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProductFlavorFindFirstArgs} args - Arguments to find a ProductFlavor
+     * @example
+     * // Get one ProductFlavor
+     * const productFlavor = await prisma.productFlavor.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ProductFlavorFindFirstArgs>(args?: SelectSubset<T, ProductFlavorFindFirstArgs<ExtArgs>>): Prisma__ProductFlavorClient<$Result.GetResult<Prisma.$ProductFlavorPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first ProductFlavor that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProductFlavorFindFirstOrThrowArgs} args - Arguments to find a ProductFlavor
+     * @example
+     * // Get one ProductFlavor
+     * const productFlavor = await prisma.productFlavor.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ProductFlavorFindFirstOrThrowArgs>(args?: SelectSubset<T, ProductFlavorFindFirstOrThrowArgs<ExtArgs>>): Prisma__ProductFlavorClient<$Result.GetResult<Prisma.$ProductFlavorPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more ProductFlavors that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProductFlavorFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all ProductFlavors
+     * const productFlavors = await prisma.productFlavor.findMany()
+     * 
+     * // Get first 10 ProductFlavors
+     * const productFlavors = await prisma.productFlavor.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const productFlavorWithIdOnly = await prisma.productFlavor.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends ProductFlavorFindManyArgs>(args?: SelectSubset<T, ProductFlavorFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProductFlavorPayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a ProductFlavor.
+     * @param {ProductFlavorCreateArgs} args - Arguments to create a ProductFlavor.
+     * @example
+     * // Create one ProductFlavor
+     * const ProductFlavor = await prisma.productFlavor.create({
+     *   data: {
+     *     // ... data to create a ProductFlavor
+     *   }
+     * })
+     * 
+     */
+    create<T extends ProductFlavorCreateArgs>(args: SelectSubset<T, ProductFlavorCreateArgs<ExtArgs>>): Prisma__ProductFlavorClient<$Result.GetResult<Prisma.$ProductFlavorPayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many ProductFlavors.
+     * @param {ProductFlavorCreateManyArgs} args - Arguments to create many ProductFlavors.
+     * @example
+     * // Create many ProductFlavors
+     * const productFlavor = await prisma.productFlavor.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ProductFlavorCreateManyArgs>(args?: SelectSubset<T, ProductFlavorCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a ProductFlavor.
+     * @param {ProductFlavorDeleteArgs} args - Arguments to delete one ProductFlavor.
+     * @example
+     * // Delete one ProductFlavor
+     * const ProductFlavor = await prisma.productFlavor.delete({
+     *   where: {
+     *     // ... filter to delete one ProductFlavor
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ProductFlavorDeleteArgs>(args: SelectSubset<T, ProductFlavorDeleteArgs<ExtArgs>>): Prisma__ProductFlavorClient<$Result.GetResult<Prisma.$ProductFlavorPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one ProductFlavor.
+     * @param {ProductFlavorUpdateArgs} args - Arguments to update one ProductFlavor.
+     * @example
+     * // Update one ProductFlavor
+     * const productFlavor = await prisma.productFlavor.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ProductFlavorUpdateArgs>(args: SelectSubset<T, ProductFlavorUpdateArgs<ExtArgs>>): Prisma__ProductFlavorClient<$Result.GetResult<Prisma.$ProductFlavorPayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more ProductFlavors.
+     * @param {ProductFlavorDeleteManyArgs} args - Arguments to filter ProductFlavors to delete.
+     * @example
+     * // Delete a few ProductFlavors
+     * const { count } = await prisma.productFlavor.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ProductFlavorDeleteManyArgs>(args?: SelectSubset<T, ProductFlavorDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ProductFlavors.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProductFlavorUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many ProductFlavors
+     * const productFlavor = await prisma.productFlavor.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ProductFlavorUpdateManyArgs>(args: SelectSubset<T, ProductFlavorUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one ProductFlavor.
+     * @param {ProductFlavorUpsertArgs} args - Arguments to update or create a ProductFlavor.
+     * @example
+     * // Update or create a ProductFlavor
+     * const productFlavor = await prisma.productFlavor.upsert({
+     *   create: {
+     *     // ... data to create a ProductFlavor
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the ProductFlavor we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ProductFlavorUpsertArgs>(args: SelectSubset<T, ProductFlavorUpsertArgs<ExtArgs>>): Prisma__ProductFlavorClient<$Result.GetResult<Prisma.$ProductFlavorPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+    /**
+     * Find zero or more ProductFlavors that matches the filter.
+     * @param {ProductFlavorFindRawArgs} args - Select which filters you would like to apply.
+     * @example
+     * const productFlavor = await prisma.productFlavor.findRaw({
+     *   filter: { age: { $gt: 25 } } 
+     * })
+     */
+    findRaw(args?: ProductFlavorFindRawArgs): Prisma.PrismaPromise<JsonObject>
+
+    /**
+     * Perform aggregation operations on a ProductFlavor.
+     * @param {ProductFlavorAggregateRawArgs} args - Select which aggregations you would like to apply.
+     * @example
+     * const productFlavor = await prisma.productFlavor.aggregateRaw({
+     *   pipeline: [
+     *     { $match: { status: "registered" } },
+     *     { $group: { _id: "$country", total: { $sum: 1 } } }
+     *   ]
+     * })
+     */
+    aggregateRaw(args?: ProductFlavorAggregateRawArgs): Prisma.PrismaPromise<JsonObject>
+
+
+    /**
+     * Count the number of ProductFlavors.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProductFlavorCountArgs} args - Arguments to filter ProductFlavors to count.
+     * @example
+     * // Count the number of ProductFlavors
+     * const count = await prisma.productFlavor.count({
+     *   where: {
+     *     // ... the filter for the ProductFlavors we want to count
+     *   }
+     * })
+    **/
+    count<T extends ProductFlavorCountArgs>(
+      args?: Subset<T, ProductFlavorCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ProductFlavorCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a ProductFlavor.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProductFlavorAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ProductFlavorAggregateArgs>(args: Subset<T, ProductFlavorAggregateArgs>): Prisma.PrismaPromise<GetProductFlavorAggregateType<T>>
+
+    /**
+     * Group by ProductFlavor.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProductFlavorGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ProductFlavorGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ProductFlavorGroupByArgs['orderBy'] }
+        : { orderBy?: ProductFlavorGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ProductFlavorGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetProductFlavorGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the ProductFlavor model
+   */
+  readonly fields: ProductFlavorFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for ProductFlavor.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ProductFlavorClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    product<T extends ProductDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ProductDefaultArgs<ExtArgs>>): Prisma__ProductClient<$Result.GetResult<Prisma.$ProductPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the ProductFlavor model
+   */ 
+  interface ProductFlavorFieldRefs {
+    readonly id: FieldRef<"ProductFlavor", 'String'>
+    readonly name: FieldRef<"ProductFlavor", 'String'>
+    readonly price: FieldRef<"ProductFlavor", 'Float'>
+    readonly productId: FieldRef<"ProductFlavor", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * ProductFlavor findUnique
+   */
+  export type ProductFlavorFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductFlavor
+     */
+    select?: ProductFlavorSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProductFlavorInclude<ExtArgs> | null
+    /**
+     * Filter, which ProductFlavor to fetch.
+     */
+    where: ProductFlavorWhereUniqueInput
+  }
+
+  /**
+   * ProductFlavor findUniqueOrThrow
+   */
+  export type ProductFlavorFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductFlavor
+     */
+    select?: ProductFlavorSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProductFlavorInclude<ExtArgs> | null
+    /**
+     * Filter, which ProductFlavor to fetch.
+     */
+    where: ProductFlavorWhereUniqueInput
+  }
+
+  /**
+   * ProductFlavor findFirst
+   */
+  export type ProductFlavorFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductFlavor
+     */
+    select?: ProductFlavorSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProductFlavorInclude<ExtArgs> | null
+    /**
+     * Filter, which ProductFlavor to fetch.
+     */
+    where?: ProductFlavorWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ProductFlavors to fetch.
+     */
+    orderBy?: ProductFlavorOrderByWithRelationInput | ProductFlavorOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ProductFlavors.
+     */
+    cursor?: ProductFlavorWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ProductFlavors from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ProductFlavors.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ProductFlavors.
+     */
+    distinct?: ProductFlavorScalarFieldEnum | ProductFlavorScalarFieldEnum[]
+  }
+
+  /**
+   * ProductFlavor findFirstOrThrow
+   */
+  export type ProductFlavorFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductFlavor
+     */
+    select?: ProductFlavorSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProductFlavorInclude<ExtArgs> | null
+    /**
+     * Filter, which ProductFlavor to fetch.
+     */
+    where?: ProductFlavorWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ProductFlavors to fetch.
+     */
+    orderBy?: ProductFlavorOrderByWithRelationInput | ProductFlavorOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ProductFlavors.
+     */
+    cursor?: ProductFlavorWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ProductFlavors from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ProductFlavors.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ProductFlavors.
+     */
+    distinct?: ProductFlavorScalarFieldEnum | ProductFlavorScalarFieldEnum[]
+  }
+
+  /**
+   * ProductFlavor findMany
+   */
+  export type ProductFlavorFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductFlavor
+     */
+    select?: ProductFlavorSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProductFlavorInclude<ExtArgs> | null
+    /**
+     * Filter, which ProductFlavors to fetch.
+     */
+    where?: ProductFlavorWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ProductFlavors to fetch.
+     */
+    orderBy?: ProductFlavorOrderByWithRelationInput | ProductFlavorOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing ProductFlavors.
+     */
+    cursor?: ProductFlavorWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ProductFlavors from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ProductFlavors.
+     */
+    skip?: number
+    distinct?: ProductFlavorScalarFieldEnum | ProductFlavorScalarFieldEnum[]
+  }
+
+  /**
+   * ProductFlavor create
+   */
+  export type ProductFlavorCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductFlavor
+     */
+    select?: ProductFlavorSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProductFlavorInclude<ExtArgs> | null
+    /**
+     * The data needed to create a ProductFlavor.
+     */
+    data: XOR<ProductFlavorCreateInput, ProductFlavorUncheckedCreateInput>
+  }
+
+  /**
+   * ProductFlavor createMany
+   */
+  export type ProductFlavorCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many ProductFlavors.
+     */
+    data: ProductFlavorCreateManyInput | ProductFlavorCreateManyInput[]
+  }
+
+  /**
+   * ProductFlavor update
+   */
+  export type ProductFlavorUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductFlavor
+     */
+    select?: ProductFlavorSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProductFlavorInclude<ExtArgs> | null
+    /**
+     * The data needed to update a ProductFlavor.
+     */
+    data: XOR<ProductFlavorUpdateInput, ProductFlavorUncheckedUpdateInput>
+    /**
+     * Choose, which ProductFlavor to update.
+     */
+    where: ProductFlavorWhereUniqueInput
+  }
+
+  /**
+   * ProductFlavor updateMany
+   */
+  export type ProductFlavorUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update ProductFlavors.
+     */
+    data: XOR<ProductFlavorUpdateManyMutationInput, ProductFlavorUncheckedUpdateManyInput>
+    /**
+     * Filter which ProductFlavors to update
+     */
+    where?: ProductFlavorWhereInput
+  }
+
+  /**
+   * ProductFlavor upsert
+   */
+  export type ProductFlavorUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductFlavor
+     */
+    select?: ProductFlavorSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProductFlavorInclude<ExtArgs> | null
+    /**
+     * The filter to search for the ProductFlavor to update in case it exists.
+     */
+    where: ProductFlavorWhereUniqueInput
+    /**
+     * In case the ProductFlavor found by the `where` argument doesn't exist, create a new ProductFlavor with this data.
+     */
+    create: XOR<ProductFlavorCreateInput, ProductFlavorUncheckedCreateInput>
+    /**
+     * In case the ProductFlavor was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ProductFlavorUpdateInput, ProductFlavorUncheckedUpdateInput>
+  }
+
+  /**
+   * ProductFlavor delete
+   */
+  export type ProductFlavorDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductFlavor
+     */
+    select?: ProductFlavorSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProductFlavorInclude<ExtArgs> | null
+    /**
+     * Filter which ProductFlavor to delete.
+     */
+    where: ProductFlavorWhereUniqueInput
+  }
+
+  /**
+   * ProductFlavor deleteMany
+   */
+  export type ProductFlavorDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ProductFlavors to delete
+     */
+    where?: ProductFlavorWhereInput
+  }
+
+  /**
+   * ProductFlavor findRaw
+   */
+  export type ProductFlavorFindRawArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The query predicate filter. If unspecified, then all documents in the collection will match the predicate. ${@link https://docs.mongodb.com/manual/reference/operator/query MongoDB Docs}.
+     */
+    filter?: InputJsonValue
+    /**
+     * Additional options to pass to the `find` command ${@link https://docs.mongodb.com/manual/reference/command/find/#command-fields MongoDB Docs}.
+     */
+    options?: InputJsonValue
+  }
+
+  /**
+   * ProductFlavor aggregateRaw
+   */
+  export type ProductFlavorAggregateRawArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * An array of aggregation stages to process and transform the document stream via the aggregation pipeline. ${@link https://docs.mongodb.com/manual/reference/operator/aggregation-pipeline MongoDB Docs}.
+     */
+    pipeline?: InputJsonValue[]
+    /**
+     * Additional options to pass to the `aggregate` command ${@link https://docs.mongodb.com/manual/reference/command/aggregate/#command-fields MongoDB Docs}.
+     */
+    options?: InputJsonValue
+  }
+
+  /**
+   * ProductFlavor without action
+   */
+  export type ProductFlavorDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductFlavor
+     */
+    select?: ProductFlavorSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProductFlavorInclude<ExtArgs> | null
   }
 
 
@@ -6457,6 +7525,7 @@ export namespace Prisma {
     productName: string | null
     quantity: number | null
     price: number | null
+    chosenFlavor: string | null
     chosenOption: string | null
     observation: string | null
   }
@@ -6468,6 +7537,7 @@ export namespace Prisma {
     productName: string | null
     quantity: number | null
     price: number | null
+    chosenFlavor: string | null
     chosenOption: string | null
     observation: string | null
   }
@@ -6479,6 +7549,7 @@ export namespace Prisma {
     productName: number
     quantity: number
     price: number
+    chosenFlavor: number
     chosenOption: number
     observation: number
     _all: number
@@ -6502,6 +7573,7 @@ export namespace Prisma {
     productName?: true
     quantity?: true
     price?: true
+    chosenFlavor?: true
     chosenOption?: true
     observation?: true
   }
@@ -6513,6 +7585,7 @@ export namespace Prisma {
     productName?: true
     quantity?: true
     price?: true
+    chosenFlavor?: true
     chosenOption?: true
     observation?: true
   }
@@ -6524,6 +7597,7 @@ export namespace Prisma {
     productName?: true
     quantity?: true
     price?: true
+    chosenFlavor?: true
     chosenOption?: true
     observation?: true
     _all?: true
@@ -6622,6 +7696,7 @@ export namespace Prisma {
     productName: string
     quantity: number
     price: number
+    chosenFlavor: string | null
     chosenOption: string | null
     observation: string | null
     _count: OrderItemCountAggregateOutputType | null
@@ -6652,6 +7727,7 @@ export namespace Prisma {
     productName?: boolean
     quantity?: boolean
     price?: boolean
+    chosenFlavor?: boolean
     chosenOption?: boolean
     observation?: boolean
     order?: boolean | OrderDefaultArgs<ExtArgs>
@@ -6666,6 +7742,7 @@ export namespace Prisma {
     productName?: boolean
     quantity?: boolean
     price?: boolean
+    chosenFlavor?: boolean
     chosenOption?: boolean
     observation?: boolean
   }
@@ -6688,6 +7765,7 @@ export namespace Prisma {
       productName: string
       quantity: number
       price: number
+      chosenFlavor: string | null
       chosenOption: string | null
       observation: string | null
     }, ExtArgs["result"]["orderItem"]>
@@ -7090,6 +8168,7 @@ export namespace Prisma {
     readonly productName: FieldRef<"OrderItem", 'String'>
     readonly quantity: FieldRef<"OrderItem", 'Int'>
     readonly price: FieldRef<"OrderItem", 'Float'>
+    readonly chosenFlavor: FieldRef<"OrderItem", 'String'>
     readonly chosenOption: FieldRef<"OrderItem", 'String'>
     readonly observation: FieldRef<"OrderItem", 'String'>
   }
@@ -7453,7 +8532,6 @@ export namespace Prisma {
     price: 'price',
     promoPrice: 'promoPrice',
     categoryId: 'categoryId',
-    tags: 'tags',
     isAvailable: 'isAvailable',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
@@ -7470,6 +8548,16 @@ export namespace Prisma {
   };
 
   export type ProductOptionScalarFieldEnum = (typeof ProductOptionScalarFieldEnum)[keyof typeof ProductOptionScalarFieldEnum]
+
+
+  export const ProductFlavorScalarFieldEnum: {
+    id: 'id',
+    name: 'name',
+    price: 'price',
+    productId: 'productId'
+  };
+
+  export type ProductFlavorScalarFieldEnum = (typeof ProductFlavorScalarFieldEnum)[keyof typeof ProductFlavorScalarFieldEnum]
 
 
   export const UserScalarFieldEnum: {
@@ -7509,6 +8597,7 @@ export namespace Prisma {
     productName: 'productName',
     quantity: 'quantity',
     price: 'price',
+    chosenFlavor: 'chosenFlavor',
     chosenOption: 'chosenOption',
     observation: 'observation'
   };
@@ -7715,12 +8804,12 @@ export namespace Prisma {
     price?: FloatFilter<"Product"> | number
     promoPrice?: FloatNullableFilter<"Product"> | number | null
     categoryId?: StringFilter<"Product"> | string
-    tags?: StringNullableListFilter<"Product">
     isAvailable?: BoolFilter<"Product"> | boolean
     createdAt?: DateTimeFilter<"Product"> | Date | string
     updatedAt?: DateTimeFilter<"Product"> | Date | string
     category?: XOR<CategoryRelationFilter, CategoryWhereInput>
     options?: ProductOptionListRelationFilter
+    flavors?: ProductFlavorListRelationFilter
     orderItems?: OrderItemListRelationFilter
   }
 
@@ -7732,12 +8821,12 @@ export namespace Prisma {
     price?: SortOrder
     promoPrice?: SortOrder
     categoryId?: SortOrder
-    tags?: SortOrder
     isAvailable?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     category?: CategoryOrderByWithRelationInput
     options?: ProductOptionOrderByRelationAggregateInput
+    flavors?: ProductFlavorOrderByRelationAggregateInput
     orderItems?: OrderItemOrderByRelationAggregateInput
   }
 
@@ -7752,12 +8841,12 @@ export namespace Prisma {
     price?: FloatFilter<"Product"> | number
     promoPrice?: FloatNullableFilter<"Product"> | number | null
     categoryId?: StringFilter<"Product"> | string
-    tags?: StringNullableListFilter<"Product">
     isAvailable?: BoolFilter<"Product"> | boolean
     createdAt?: DateTimeFilter<"Product"> | Date | string
     updatedAt?: DateTimeFilter<"Product"> | Date | string
     category?: XOR<CategoryRelationFilter, CategoryWhereInput>
     options?: ProductOptionListRelationFilter
+    flavors?: ProductFlavorListRelationFilter
     orderItems?: OrderItemListRelationFilter
   }, "id">
 
@@ -7769,7 +8858,6 @@ export namespace Prisma {
     price?: SortOrder
     promoPrice?: SortOrder
     categoryId?: SortOrder
-    tags?: SortOrder
     isAvailable?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -7791,7 +8879,6 @@ export namespace Prisma {
     price?: FloatWithAggregatesFilter<"Product"> | number
     promoPrice?: FloatNullableWithAggregatesFilter<"Product"> | number | null
     categoryId?: StringWithAggregatesFilter<"Product"> | string
-    tags?: StringNullableListFilter<"Product">
     isAvailable?: BoolWithAggregatesFilter<"Product"> | boolean
     createdAt?: DateTimeWithAggregatesFilter<"Product"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Product"> | Date | string
@@ -7847,6 +8934,58 @@ export namespace Prisma {
     name?: StringWithAggregatesFilter<"ProductOption"> | string
     price?: FloatWithAggregatesFilter<"ProductOption"> | number
     productId?: StringWithAggregatesFilter<"ProductOption"> | string
+  }
+
+  export type ProductFlavorWhereInput = {
+    AND?: ProductFlavorWhereInput | ProductFlavorWhereInput[]
+    OR?: ProductFlavorWhereInput[]
+    NOT?: ProductFlavorWhereInput | ProductFlavorWhereInput[]
+    id?: StringFilter<"ProductFlavor"> | string
+    name?: StringFilter<"ProductFlavor"> | string
+    price?: FloatFilter<"ProductFlavor"> | number
+    productId?: StringFilter<"ProductFlavor"> | string
+    product?: XOR<ProductRelationFilter, ProductWhereInput>
+  }
+
+  export type ProductFlavorOrderByWithRelationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    price?: SortOrder
+    productId?: SortOrder
+    product?: ProductOrderByWithRelationInput
+  }
+
+  export type ProductFlavorWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: ProductFlavorWhereInput | ProductFlavorWhereInput[]
+    OR?: ProductFlavorWhereInput[]
+    NOT?: ProductFlavorWhereInput | ProductFlavorWhereInput[]
+    name?: StringFilter<"ProductFlavor"> | string
+    price?: FloatFilter<"ProductFlavor"> | number
+    productId?: StringFilter<"ProductFlavor"> | string
+    product?: XOR<ProductRelationFilter, ProductWhereInput>
+  }, "id">
+
+  export type ProductFlavorOrderByWithAggregationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    price?: SortOrder
+    productId?: SortOrder
+    _count?: ProductFlavorCountOrderByAggregateInput
+    _avg?: ProductFlavorAvgOrderByAggregateInput
+    _max?: ProductFlavorMaxOrderByAggregateInput
+    _min?: ProductFlavorMinOrderByAggregateInput
+    _sum?: ProductFlavorSumOrderByAggregateInput
+  }
+
+  export type ProductFlavorScalarWhereWithAggregatesInput = {
+    AND?: ProductFlavorScalarWhereWithAggregatesInput | ProductFlavorScalarWhereWithAggregatesInput[]
+    OR?: ProductFlavorScalarWhereWithAggregatesInput[]
+    NOT?: ProductFlavorScalarWhereWithAggregatesInput | ProductFlavorScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"ProductFlavor"> | string
+    name?: StringWithAggregatesFilter<"ProductFlavor"> | string
+    price?: FloatWithAggregatesFilter<"ProductFlavor"> | number
+    productId?: StringWithAggregatesFilter<"ProductFlavor"> | string
   }
 
   export type UserWhereInput = {
@@ -8014,6 +9153,7 @@ export namespace Prisma {
     productName?: StringFilter<"OrderItem"> | string
     quantity?: IntFilter<"OrderItem"> | number
     price?: FloatFilter<"OrderItem"> | number
+    chosenFlavor?: StringNullableFilter<"OrderItem"> | string | null
     chosenOption?: StringNullableFilter<"OrderItem"> | string | null
     observation?: StringNullableFilter<"OrderItem"> | string | null
     order?: XOR<OrderRelationFilter, OrderWhereInput>
@@ -8027,6 +9167,7 @@ export namespace Prisma {
     productName?: SortOrder
     quantity?: SortOrder
     price?: SortOrder
+    chosenFlavor?: SortOrder
     chosenOption?: SortOrder
     observation?: SortOrder
     order?: OrderOrderByWithRelationInput
@@ -8043,6 +9184,7 @@ export namespace Prisma {
     productName?: StringFilter<"OrderItem"> | string
     quantity?: IntFilter<"OrderItem"> | number
     price?: FloatFilter<"OrderItem"> | number
+    chosenFlavor?: StringNullableFilter<"OrderItem"> | string | null
     chosenOption?: StringNullableFilter<"OrderItem"> | string | null
     observation?: StringNullableFilter<"OrderItem"> | string | null
     order?: XOR<OrderRelationFilter, OrderWhereInput>
@@ -8056,6 +9198,7 @@ export namespace Prisma {
     productName?: SortOrder
     quantity?: SortOrder
     price?: SortOrder
+    chosenFlavor?: SortOrder
     chosenOption?: SortOrder
     observation?: SortOrder
     _count?: OrderItemCountOrderByAggregateInput
@@ -8075,6 +9218,7 @@ export namespace Prisma {
     productName?: StringWithAggregatesFilter<"OrderItem"> | string
     quantity?: IntWithAggregatesFilter<"OrderItem"> | number
     price?: FloatWithAggregatesFilter<"OrderItem"> | number
+    chosenFlavor?: StringNullableWithAggregatesFilter<"OrderItem"> | string | null
     chosenOption?: StringNullableWithAggregatesFilter<"OrderItem"> | string | null
     observation?: StringNullableWithAggregatesFilter<"OrderItem"> | string | null
   }
@@ -8128,12 +9272,12 @@ export namespace Prisma {
     imageUrl?: string | null
     price: number
     promoPrice?: number | null
-    tags?: ProductCreatetagsInput | string[]
     isAvailable?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     category: CategoryCreateNestedOneWithoutProductsInput
     options?: ProductOptionCreateNestedManyWithoutProductInput
+    flavors?: ProductFlavorCreateNestedManyWithoutProductInput
     orderItems?: OrderItemCreateNestedManyWithoutProductInput
   }
 
@@ -8145,11 +9289,11 @@ export namespace Prisma {
     price: number
     promoPrice?: number | null
     categoryId: string
-    tags?: ProductCreatetagsInput | string[]
     isAvailable?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     options?: ProductOptionUncheckedCreateNestedManyWithoutProductInput
+    flavors?: ProductFlavorUncheckedCreateNestedManyWithoutProductInput
     orderItems?: OrderItemUncheckedCreateNestedManyWithoutProductInput
   }
 
@@ -8159,12 +9303,12 @@ export namespace Prisma {
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     price?: FloatFieldUpdateOperationsInput | number
     promoPrice?: NullableFloatFieldUpdateOperationsInput | number | null
-    tags?: ProductUpdatetagsInput | string[]
     isAvailable?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     category?: CategoryUpdateOneRequiredWithoutProductsNestedInput
     options?: ProductOptionUpdateManyWithoutProductNestedInput
+    flavors?: ProductFlavorUpdateManyWithoutProductNestedInput
     orderItems?: OrderItemUpdateManyWithoutProductNestedInput
   }
 
@@ -8175,11 +9319,11 @@ export namespace Prisma {
     price?: FloatFieldUpdateOperationsInput | number
     promoPrice?: NullableFloatFieldUpdateOperationsInput | number | null
     categoryId?: StringFieldUpdateOperationsInput | string
-    tags?: ProductUpdatetagsInput | string[]
     isAvailable?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     options?: ProductOptionUncheckedUpdateManyWithoutProductNestedInput
+    flavors?: ProductFlavorUncheckedUpdateManyWithoutProductNestedInput
     orderItems?: OrderItemUncheckedUpdateManyWithoutProductNestedInput
   }
 
@@ -8191,7 +9335,6 @@ export namespace Prisma {
     price: number
     promoPrice?: number | null
     categoryId: string
-    tags?: ProductCreatetagsInput | string[]
     isAvailable?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -8203,7 +9346,6 @@ export namespace Prisma {
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     price?: FloatFieldUpdateOperationsInput | number
     promoPrice?: NullableFloatFieldUpdateOperationsInput | number | null
-    tags?: ProductUpdatetagsInput | string[]
     isAvailable?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -8216,7 +9358,6 @@ export namespace Prisma {
     price?: FloatFieldUpdateOperationsInput | number
     promoPrice?: NullableFloatFieldUpdateOperationsInput | number | null
     categoryId?: StringFieldUpdateOperationsInput | string
-    tags?: ProductUpdatetagsInput | string[]
     isAvailable?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -8261,6 +9402,50 @@ export namespace Prisma {
   }
 
   export type ProductOptionUncheckedUpdateManyInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    price?: FloatFieldUpdateOperationsInput | number
+    productId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type ProductFlavorCreateInput = {
+    id?: string
+    name: string
+    price?: number
+    product: ProductCreateNestedOneWithoutFlavorsInput
+  }
+
+  export type ProductFlavorUncheckedCreateInput = {
+    id?: string
+    name: string
+    price?: number
+    productId: string
+  }
+
+  export type ProductFlavorUpdateInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    price?: FloatFieldUpdateOperationsInput | number
+    product?: ProductUpdateOneRequiredWithoutFlavorsNestedInput
+  }
+
+  export type ProductFlavorUncheckedUpdateInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    price?: FloatFieldUpdateOperationsInput | number
+    productId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type ProductFlavorCreateManyInput = {
+    id?: string
+    name: string
+    price?: number
+    productId: string
+  }
+
+  export type ProductFlavorUpdateManyMutationInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    price?: FloatFieldUpdateOperationsInput | number
+  }
+
+  export type ProductFlavorUncheckedUpdateManyInput = {
     name?: StringFieldUpdateOperationsInput | string
     price?: FloatFieldUpdateOperationsInput | number
     productId?: StringFieldUpdateOperationsInput | string
@@ -8438,6 +9623,7 @@ export namespace Prisma {
     productName: string
     quantity: number
     price: number
+    chosenFlavor?: string | null
     chosenOption?: string | null
     observation?: string | null
     order: OrderCreateNestedOneWithoutItemsInput
@@ -8451,6 +9637,7 @@ export namespace Prisma {
     productName: string
     quantity: number
     price: number
+    chosenFlavor?: string | null
     chosenOption?: string | null
     observation?: string | null
   }
@@ -8459,6 +9646,7 @@ export namespace Prisma {
     productName?: StringFieldUpdateOperationsInput | string
     quantity?: IntFieldUpdateOperationsInput | number
     price?: FloatFieldUpdateOperationsInput | number
+    chosenFlavor?: NullableStringFieldUpdateOperationsInput | string | null
     chosenOption?: NullableStringFieldUpdateOperationsInput | string | null
     observation?: NullableStringFieldUpdateOperationsInput | string | null
     order?: OrderUpdateOneRequiredWithoutItemsNestedInput
@@ -8471,6 +9659,7 @@ export namespace Prisma {
     productName?: StringFieldUpdateOperationsInput | string
     quantity?: IntFieldUpdateOperationsInput | number
     price?: FloatFieldUpdateOperationsInput | number
+    chosenFlavor?: NullableStringFieldUpdateOperationsInput | string | null
     chosenOption?: NullableStringFieldUpdateOperationsInput | string | null
     observation?: NullableStringFieldUpdateOperationsInput | string | null
   }
@@ -8482,6 +9671,7 @@ export namespace Prisma {
     productName: string
     quantity: number
     price: number
+    chosenFlavor?: string | null
     chosenOption?: string | null
     observation?: string | null
   }
@@ -8490,6 +9680,7 @@ export namespace Prisma {
     productName?: StringFieldUpdateOperationsInput | string
     quantity?: IntFieldUpdateOperationsInput | number
     price?: FloatFieldUpdateOperationsInput | number
+    chosenFlavor?: NullableStringFieldUpdateOperationsInput | string | null
     chosenOption?: NullableStringFieldUpdateOperationsInput | string | null
     observation?: NullableStringFieldUpdateOperationsInput | string | null
   }
@@ -8500,6 +9691,7 @@ export namespace Prisma {
     productName?: StringFieldUpdateOperationsInput | string
     quantity?: IntFieldUpdateOperationsInput | number
     price?: FloatFieldUpdateOperationsInput | number
+    chosenFlavor?: NullableStringFieldUpdateOperationsInput | string | null
     chosenOption?: NullableStringFieldUpdateOperationsInput | string | null
     observation?: NullableStringFieldUpdateOperationsInput | string | null
   }
@@ -8604,14 +9796,6 @@ export namespace Prisma {
     isSet?: boolean
   }
 
-  export type StringNullableListFilter<$PrismaModel = never> = {
-    equals?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    has?: string | StringFieldRefInput<$PrismaModel> | null
-    hasEvery?: string[] | ListStringFieldRefInput<$PrismaModel>
-    hasSome?: string[] | ListStringFieldRefInput<$PrismaModel>
-    isEmpty?: boolean
-  }
-
   export type BoolFilter<$PrismaModel = never> = {
     equals?: boolean | BooleanFieldRefInput<$PrismaModel>
     not?: NestedBoolFilter<$PrismaModel> | boolean
@@ -8639,6 +9823,12 @@ export namespace Prisma {
     none?: ProductOptionWhereInput
   }
 
+  export type ProductFlavorListRelationFilter = {
+    every?: ProductFlavorWhereInput
+    some?: ProductFlavorWhereInput
+    none?: ProductFlavorWhereInput
+  }
+
   export type OrderItemListRelationFilter = {
     every?: OrderItemWhereInput
     some?: OrderItemWhereInput
@@ -8646,6 +9836,10 @@ export namespace Prisma {
   }
 
   export type ProductOptionOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type ProductFlavorOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -8661,7 +9855,6 @@ export namespace Prisma {
     price?: SortOrder
     promoPrice?: SortOrder
     categoryId?: SortOrder
-    tags?: SortOrder
     isAvailable?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -8808,6 +10001,35 @@ export namespace Prisma {
   }
 
   export type ProductOptionSumOrderByAggregateInput = {
+    price?: SortOrder
+  }
+
+  export type ProductFlavorCountOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    price?: SortOrder
+    productId?: SortOrder
+  }
+
+  export type ProductFlavorAvgOrderByAggregateInput = {
+    price?: SortOrder
+  }
+
+  export type ProductFlavorMaxOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    price?: SortOrder
+    productId?: SortOrder
+  }
+
+  export type ProductFlavorMinOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    price?: SortOrder
+    productId?: SortOrder
+  }
+
+  export type ProductFlavorSumOrderByAggregateInput = {
     price?: SortOrder
   }
 
@@ -9024,6 +10246,7 @@ export namespace Prisma {
     productName?: SortOrder
     quantity?: SortOrder
     price?: SortOrder
+    chosenFlavor?: SortOrder
     chosenOption?: SortOrder
     observation?: SortOrder
   }
@@ -9040,6 +10263,7 @@ export namespace Prisma {
     productName?: SortOrder
     quantity?: SortOrder
     price?: SortOrder
+    chosenFlavor?: SortOrder
     chosenOption?: SortOrder
     observation?: SortOrder
   }
@@ -9051,6 +10275,7 @@ export namespace Prisma {
     productName?: SortOrder
     quantity?: SortOrder
     price?: SortOrder
+    chosenFlavor?: SortOrder
     chosenOption?: SortOrder
     observation?: SortOrder
   }
@@ -9122,10 +10347,6 @@ export namespace Prisma {
     deleteMany?: ProductScalarWhereInput | ProductScalarWhereInput[]
   }
 
-  export type ProductCreatetagsInput = {
-    set: string[]
-  }
-
   export type CategoryCreateNestedOneWithoutProductsInput = {
     create?: XOR<CategoryCreateWithoutProductsInput, CategoryUncheckedCreateWithoutProductsInput>
     connectOrCreate?: CategoryCreateOrConnectWithoutProductsInput
@@ -9137,6 +10358,13 @@ export namespace Prisma {
     connectOrCreate?: ProductOptionCreateOrConnectWithoutProductInput | ProductOptionCreateOrConnectWithoutProductInput[]
     createMany?: ProductOptionCreateManyProductInputEnvelope
     connect?: ProductOptionWhereUniqueInput | ProductOptionWhereUniqueInput[]
+  }
+
+  export type ProductFlavorCreateNestedManyWithoutProductInput = {
+    create?: XOR<ProductFlavorCreateWithoutProductInput, ProductFlavorUncheckedCreateWithoutProductInput> | ProductFlavorCreateWithoutProductInput[] | ProductFlavorUncheckedCreateWithoutProductInput[]
+    connectOrCreate?: ProductFlavorCreateOrConnectWithoutProductInput | ProductFlavorCreateOrConnectWithoutProductInput[]
+    createMany?: ProductFlavorCreateManyProductInputEnvelope
+    connect?: ProductFlavorWhereUniqueInput | ProductFlavorWhereUniqueInput[]
   }
 
   export type OrderItemCreateNestedManyWithoutProductInput = {
@@ -9151,6 +10379,13 @@ export namespace Prisma {
     connectOrCreate?: ProductOptionCreateOrConnectWithoutProductInput | ProductOptionCreateOrConnectWithoutProductInput[]
     createMany?: ProductOptionCreateManyProductInputEnvelope
     connect?: ProductOptionWhereUniqueInput | ProductOptionWhereUniqueInput[]
+  }
+
+  export type ProductFlavorUncheckedCreateNestedManyWithoutProductInput = {
+    create?: XOR<ProductFlavorCreateWithoutProductInput, ProductFlavorUncheckedCreateWithoutProductInput> | ProductFlavorCreateWithoutProductInput[] | ProductFlavorUncheckedCreateWithoutProductInput[]
+    connectOrCreate?: ProductFlavorCreateOrConnectWithoutProductInput | ProductFlavorCreateOrConnectWithoutProductInput[]
+    createMany?: ProductFlavorCreateManyProductInputEnvelope
+    connect?: ProductFlavorWhereUniqueInput | ProductFlavorWhereUniqueInput[]
   }
 
   export type OrderItemUncheckedCreateNestedManyWithoutProductInput = {
@@ -9180,11 +10415,6 @@ export namespace Prisma {
     multiply?: number
     divide?: number
     unset?: boolean
-  }
-
-  export type ProductUpdatetagsInput = {
-    set?: string[]
-    push?: string | string[]
   }
 
   export type BoolFieldUpdateOperationsInput = {
@@ -9217,6 +10447,20 @@ export namespace Prisma {
     deleteMany?: ProductOptionScalarWhereInput | ProductOptionScalarWhereInput[]
   }
 
+  export type ProductFlavorUpdateManyWithoutProductNestedInput = {
+    create?: XOR<ProductFlavorCreateWithoutProductInput, ProductFlavorUncheckedCreateWithoutProductInput> | ProductFlavorCreateWithoutProductInput[] | ProductFlavorUncheckedCreateWithoutProductInput[]
+    connectOrCreate?: ProductFlavorCreateOrConnectWithoutProductInput | ProductFlavorCreateOrConnectWithoutProductInput[]
+    upsert?: ProductFlavorUpsertWithWhereUniqueWithoutProductInput | ProductFlavorUpsertWithWhereUniqueWithoutProductInput[]
+    createMany?: ProductFlavorCreateManyProductInputEnvelope
+    set?: ProductFlavorWhereUniqueInput | ProductFlavorWhereUniqueInput[]
+    disconnect?: ProductFlavorWhereUniqueInput | ProductFlavorWhereUniqueInput[]
+    delete?: ProductFlavorWhereUniqueInput | ProductFlavorWhereUniqueInput[]
+    connect?: ProductFlavorWhereUniqueInput | ProductFlavorWhereUniqueInput[]
+    update?: ProductFlavorUpdateWithWhereUniqueWithoutProductInput | ProductFlavorUpdateWithWhereUniqueWithoutProductInput[]
+    updateMany?: ProductFlavorUpdateManyWithWhereWithoutProductInput | ProductFlavorUpdateManyWithWhereWithoutProductInput[]
+    deleteMany?: ProductFlavorScalarWhereInput | ProductFlavorScalarWhereInput[]
+  }
+
   export type OrderItemUpdateManyWithoutProductNestedInput = {
     create?: XOR<OrderItemCreateWithoutProductInput, OrderItemUncheckedCreateWithoutProductInput> | OrderItemCreateWithoutProductInput[] | OrderItemUncheckedCreateWithoutProductInput[]
     connectOrCreate?: OrderItemCreateOrConnectWithoutProductInput | OrderItemCreateOrConnectWithoutProductInput[]
@@ -9245,6 +10489,20 @@ export namespace Prisma {
     deleteMany?: ProductOptionScalarWhereInput | ProductOptionScalarWhereInput[]
   }
 
+  export type ProductFlavorUncheckedUpdateManyWithoutProductNestedInput = {
+    create?: XOR<ProductFlavorCreateWithoutProductInput, ProductFlavorUncheckedCreateWithoutProductInput> | ProductFlavorCreateWithoutProductInput[] | ProductFlavorUncheckedCreateWithoutProductInput[]
+    connectOrCreate?: ProductFlavorCreateOrConnectWithoutProductInput | ProductFlavorCreateOrConnectWithoutProductInput[]
+    upsert?: ProductFlavorUpsertWithWhereUniqueWithoutProductInput | ProductFlavorUpsertWithWhereUniqueWithoutProductInput[]
+    createMany?: ProductFlavorCreateManyProductInputEnvelope
+    set?: ProductFlavorWhereUniqueInput | ProductFlavorWhereUniqueInput[]
+    disconnect?: ProductFlavorWhereUniqueInput | ProductFlavorWhereUniqueInput[]
+    delete?: ProductFlavorWhereUniqueInput | ProductFlavorWhereUniqueInput[]
+    connect?: ProductFlavorWhereUniqueInput | ProductFlavorWhereUniqueInput[]
+    update?: ProductFlavorUpdateWithWhereUniqueWithoutProductInput | ProductFlavorUpdateWithWhereUniqueWithoutProductInput[]
+    updateMany?: ProductFlavorUpdateManyWithWhereWithoutProductInput | ProductFlavorUpdateManyWithWhereWithoutProductInput[]
+    deleteMany?: ProductFlavorScalarWhereInput | ProductFlavorScalarWhereInput[]
+  }
+
   export type OrderItemUncheckedUpdateManyWithoutProductNestedInput = {
     create?: XOR<OrderItemCreateWithoutProductInput, OrderItemUncheckedCreateWithoutProductInput> | OrderItemCreateWithoutProductInput[] | OrderItemUncheckedCreateWithoutProductInput[]
     connectOrCreate?: OrderItemCreateOrConnectWithoutProductInput | OrderItemCreateOrConnectWithoutProductInput[]
@@ -9271,6 +10529,20 @@ export namespace Prisma {
     upsert?: ProductUpsertWithoutOptionsInput
     connect?: ProductWhereUniqueInput
     update?: XOR<XOR<ProductUpdateToOneWithWhereWithoutOptionsInput, ProductUpdateWithoutOptionsInput>, ProductUncheckedUpdateWithoutOptionsInput>
+  }
+
+  export type ProductCreateNestedOneWithoutFlavorsInput = {
+    create?: XOR<ProductCreateWithoutFlavorsInput, ProductUncheckedCreateWithoutFlavorsInput>
+    connectOrCreate?: ProductCreateOrConnectWithoutFlavorsInput
+    connect?: ProductWhereUniqueInput
+  }
+
+  export type ProductUpdateOneRequiredWithoutFlavorsNestedInput = {
+    create?: XOR<ProductCreateWithoutFlavorsInput, ProductUncheckedCreateWithoutFlavorsInput>
+    connectOrCreate?: ProductCreateOrConnectWithoutFlavorsInput
+    upsert?: ProductUpsertWithoutFlavorsInput
+    connect?: ProductWhereUniqueInput
+    update?: XOR<XOR<ProductUpdateToOneWithWhereWithoutFlavorsInput, ProductUpdateWithoutFlavorsInput>, ProductUncheckedUpdateWithoutFlavorsInput>
   }
 
   export type OrderCreateNestedManyWithoutUserInput = {
@@ -9727,11 +10999,11 @@ export namespace Prisma {
     imageUrl?: string | null
     price: number
     promoPrice?: number | null
-    tags?: ProductCreatetagsInput | string[]
     isAvailable?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     options?: ProductOptionCreateNestedManyWithoutProductInput
+    flavors?: ProductFlavorCreateNestedManyWithoutProductInput
     orderItems?: OrderItemCreateNestedManyWithoutProductInput
   }
 
@@ -9742,11 +11014,11 @@ export namespace Prisma {
     imageUrl?: string | null
     price: number
     promoPrice?: number | null
-    tags?: ProductCreatetagsInput | string[]
     isAvailable?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     options?: ProductOptionUncheckedCreateNestedManyWithoutProductInput
+    flavors?: ProductFlavorUncheckedCreateNestedManyWithoutProductInput
     orderItems?: OrderItemUncheckedCreateNestedManyWithoutProductInput
   }
 
@@ -9786,7 +11058,6 @@ export namespace Prisma {
     price?: FloatFilter<"Product"> | number
     promoPrice?: FloatNullableFilter<"Product"> | number | null
     categoryId?: StringFilter<"Product"> | string
-    tags?: StringNullableListFilter<"Product">
     isAvailable?: BoolFilter<"Product"> | boolean
     createdAt?: DateTimeFilter<"Product"> | Date | string
     updatedAt?: DateTimeFilter<"Product"> | Date | string
@@ -9830,11 +11101,33 @@ export namespace Prisma {
     data: ProductOptionCreateManyProductInput | ProductOptionCreateManyProductInput[]
   }
 
+  export type ProductFlavorCreateWithoutProductInput = {
+    id?: string
+    name: string
+    price?: number
+  }
+
+  export type ProductFlavorUncheckedCreateWithoutProductInput = {
+    id?: string
+    name: string
+    price?: number
+  }
+
+  export type ProductFlavorCreateOrConnectWithoutProductInput = {
+    where: ProductFlavorWhereUniqueInput
+    create: XOR<ProductFlavorCreateWithoutProductInput, ProductFlavorUncheckedCreateWithoutProductInput>
+  }
+
+  export type ProductFlavorCreateManyProductInputEnvelope = {
+    data: ProductFlavorCreateManyProductInput | ProductFlavorCreateManyProductInput[]
+  }
+
   export type OrderItemCreateWithoutProductInput = {
     id?: string
     productName: string
     quantity: number
     price: number
+    chosenFlavor?: string | null
     chosenOption?: string | null
     observation?: string | null
     order: OrderCreateNestedOneWithoutItemsInput
@@ -9846,6 +11139,7 @@ export namespace Prisma {
     productName: string
     quantity: number
     price: number
+    chosenFlavor?: string | null
     chosenOption?: string | null
     observation?: string | null
   }
@@ -9906,6 +11200,32 @@ export namespace Prisma {
     productId?: StringFilter<"ProductOption"> | string
   }
 
+  export type ProductFlavorUpsertWithWhereUniqueWithoutProductInput = {
+    where: ProductFlavorWhereUniqueInput
+    update: XOR<ProductFlavorUpdateWithoutProductInput, ProductFlavorUncheckedUpdateWithoutProductInput>
+    create: XOR<ProductFlavorCreateWithoutProductInput, ProductFlavorUncheckedCreateWithoutProductInput>
+  }
+
+  export type ProductFlavorUpdateWithWhereUniqueWithoutProductInput = {
+    where: ProductFlavorWhereUniqueInput
+    data: XOR<ProductFlavorUpdateWithoutProductInput, ProductFlavorUncheckedUpdateWithoutProductInput>
+  }
+
+  export type ProductFlavorUpdateManyWithWhereWithoutProductInput = {
+    where: ProductFlavorScalarWhereInput
+    data: XOR<ProductFlavorUpdateManyMutationInput, ProductFlavorUncheckedUpdateManyWithoutProductInput>
+  }
+
+  export type ProductFlavorScalarWhereInput = {
+    AND?: ProductFlavorScalarWhereInput | ProductFlavorScalarWhereInput[]
+    OR?: ProductFlavorScalarWhereInput[]
+    NOT?: ProductFlavorScalarWhereInput | ProductFlavorScalarWhereInput[]
+    id?: StringFilter<"ProductFlavor"> | string
+    name?: StringFilter<"ProductFlavor"> | string
+    price?: FloatFilter<"ProductFlavor"> | number
+    productId?: StringFilter<"ProductFlavor"> | string
+  }
+
   export type OrderItemUpsertWithWhereUniqueWithoutProductInput = {
     where: OrderItemWhereUniqueInput
     update: XOR<OrderItemUpdateWithoutProductInput, OrderItemUncheckedUpdateWithoutProductInput>
@@ -9932,6 +11252,7 @@ export namespace Prisma {
     productName?: StringFilter<"OrderItem"> | string
     quantity?: IntFilter<"OrderItem"> | number
     price?: FloatFilter<"OrderItem"> | number
+    chosenFlavor?: StringNullableFilter<"OrderItem"> | string | null
     chosenOption?: StringNullableFilter<"OrderItem"> | string | null
     observation?: StringNullableFilter<"OrderItem"> | string | null
   }
@@ -9943,11 +11264,11 @@ export namespace Prisma {
     imageUrl?: string | null
     price: number
     promoPrice?: number | null
-    tags?: ProductCreatetagsInput | string[]
     isAvailable?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     category: CategoryCreateNestedOneWithoutProductsInput
+    flavors?: ProductFlavorCreateNestedManyWithoutProductInput
     orderItems?: OrderItemCreateNestedManyWithoutProductInput
   }
 
@@ -9959,10 +11280,10 @@ export namespace Prisma {
     price: number
     promoPrice?: number | null
     categoryId: string
-    tags?: ProductCreatetagsInput | string[]
     isAvailable?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    flavors?: ProductFlavorUncheckedCreateNestedManyWithoutProductInput
     orderItems?: OrderItemUncheckedCreateNestedManyWithoutProductInput
   }
 
@@ -9988,11 +11309,11 @@ export namespace Prisma {
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     price?: FloatFieldUpdateOperationsInput | number
     promoPrice?: NullableFloatFieldUpdateOperationsInput | number | null
-    tags?: ProductUpdatetagsInput | string[]
     isAvailable?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     category?: CategoryUpdateOneRequiredWithoutProductsNestedInput
+    flavors?: ProductFlavorUpdateManyWithoutProductNestedInput
     orderItems?: OrderItemUpdateManyWithoutProductNestedInput
   }
 
@@ -10003,10 +11324,84 @@ export namespace Prisma {
     price?: FloatFieldUpdateOperationsInput | number
     promoPrice?: NullableFloatFieldUpdateOperationsInput | number | null
     categoryId?: StringFieldUpdateOperationsInput | string
-    tags?: ProductUpdatetagsInput | string[]
     isAvailable?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    flavors?: ProductFlavorUncheckedUpdateManyWithoutProductNestedInput
+    orderItems?: OrderItemUncheckedUpdateManyWithoutProductNestedInput
+  }
+
+  export type ProductCreateWithoutFlavorsInput = {
+    id?: string
+    name: string
+    description?: string | null
+    imageUrl?: string | null
+    price: number
+    promoPrice?: number | null
+    isAvailable?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    category: CategoryCreateNestedOneWithoutProductsInput
+    options?: ProductOptionCreateNestedManyWithoutProductInput
+    orderItems?: OrderItemCreateNestedManyWithoutProductInput
+  }
+
+  export type ProductUncheckedCreateWithoutFlavorsInput = {
+    id?: string
+    name: string
+    description?: string | null
+    imageUrl?: string | null
+    price: number
+    promoPrice?: number | null
+    categoryId: string
+    isAvailable?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    options?: ProductOptionUncheckedCreateNestedManyWithoutProductInput
+    orderItems?: OrderItemUncheckedCreateNestedManyWithoutProductInput
+  }
+
+  export type ProductCreateOrConnectWithoutFlavorsInput = {
+    where: ProductWhereUniqueInput
+    create: XOR<ProductCreateWithoutFlavorsInput, ProductUncheckedCreateWithoutFlavorsInput>
+  }
+
+  export type ProductUpsertWithoutFlavorsInput = {
+    update: XOR<ProductUpdateWithoutFlavorsInput, ProductUncheckedUpdateWithoutFlavorsInput>
+    create: XOR<ProductCreateWithoutFlavorsInput, ProductUncheckedCreateWithoutFlavorsInput>
+    where?: ProductWhereInput
+  }
+
+  export type ProductUpdateToOneWithWhereWithoutFlavorsInput = {
+    where?: ProductWhereInput
+    data: XOR<ProductUpdateWithoutFlavorsInput, ProductUncheckedUpdateWithoutFlavorsInput>
+  }
+
+  export type ProductUpdateWithoutFlavorsInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    price?: FloatFieldUpdateOperationsInput | number
+    promoPrice?: NullableFloatFieldUpdateOperationsInput | number | null
+    isAvailable?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    category?: CategoryUpdateOneRequiredWithoutProductsNestedInput
+    options?: ProductOptionUpdateManyWithoutProductNestedInput
+    orderItems?: OrderItemUpdateManyWithoutProductNestedInput
+  }
+
+  export type ProductUncheckedUpdateWithoutFlavorsInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    price?: FloatFieldUpdateOperationsInput | number
+    promoPrice?: NullableFloatFieldUpdateOperationsInput | number | null
+    categoryId?: StringFieldUpdateOperationsInput | string
+    isAvailable?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    options?: ProductOptionUncheckedUpdateManyWithoutProductNestedInput
     orderItems?: OrderItemUncheckedUpdateManyWithoutProductNestedInput
   }
 
@@ -10109,6 +11504,7 @@ export namespace Prisma {
     productName: string
     quantity: number
     price: number
+    chosenFlavor?: string | null
     chosenOption?: string | null
     observation?: string | null
     product: ProductCreateNestedOneWithoutOrderItemsInput
@@ -10120,6 +11516,7 @@ export namespace Prisma {
     productName: string
     quantity: number
     price: number
+    chosenFlavor?: string | null
     chosenOption?: string | null
     observation?: string | null
   }
@@ -10218,12 +11615,12 @@ export namespace Prisma {
     imageUrl?: string | null
     price: number
     promoPrice?: number | null
-    tags?: ProductCreatetagsInput | string[]
     isAvailable?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     category: CategoryCreateNestedOneWithoutProductsInput
     options?: ProductOptionCreateNestedManyWithoutProductInput
+    flavors?: ProductFlavorCreateNestedManyWithoutProductInput
   }
 
   export type ProductUncheckedCreateWithoutOrderItemsInput = {
@@ -10234,11 +11631,11 @@ export namespace Prisma {
     price: number
     promoPrice?: number | null
     categoryId: string
-    tags?: ProductCreatetagsInput | string[]
     isAvailable?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     options?: ProductOptionUncheckedCreateNestedManyWithoutProductInput
+    flavors?: ProductFlavorUncheckedCreateNestedManyWithoutProductInput
   }
 
   export type ProductCreateOrConnectWithoutOrderItemsInput = {
@@ -10298,12 +11695,12 @@ export namespace Prisma {
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     price?: FloatFieldUpdateOperationsInput | number
     promoPrice?: NullableFloatFieldUpdateOperationsInput | number | null
-    tags?: ProductUpdatetagsInput | string[]
     isAvailable?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     category?: CategoryUpdateOneRequiredWithoutProductsNestedInput
     options?: ProductOptionUpdateManyWithoutProductNestedInput
+    flavors?: ProductFlavorUpdateManyWithoutProductNestedInput
   }
 
   export type ProductUncheckedUpdateWithoutOrderItemsInput = {
@@ -10313,11 +11710,11 @@ export namespace Prisma {
     price?: FloatFieldUpdateOperationsInput | number
     promoPrice?: NullableFloatFieldUpdateOperationsInput | number | null
     categoryId?: StringFieldUpdateOperationsInput | string
-    tags?: ProductUpdatetagsInput | string[]
     isAvailable?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     options?: ProductOptionUncheckedUpdateManyWithoutProductNestedInput
+    flavors?: ProductFlavorUncheckedUpdateManyWithoutProductNestedInput
   }
 
   export type ProductCreateManyCategoryInput = {
@@ -10327,7 +11724,6 @@ export namespace Prisma {
     imageUrl?: string | null
     price: number
     promoPrice?: number | null
-    tags?: ProductCreatetagsInput | string[]
     isAvailable?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -10339,11 +11735,11 @@ export namespace Prisma {
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     price?: FloatFieldUpdateOperationsInput | number
     promoPrice?: NullableFloatFieldUpdateOperationsInput | number | null
-    tags?: ProductUpdatetagsInput | string[]
     isAvailable?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     options?: ProductOptionUpdateManyWithoutProductNestedInput
+    flavors?: ProductFlavorUpdateManyWithoutProductNestedInput
     orderItems?: OrderItemUpdateManyWithoutProductNestedInput
   }
 
@@ -10353,11 +11749,11 @@ export namespace Prisma {
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     price?: FloatFieldUpdateOperationsInput | number
     promoPrice?: NullableFloatFieldUpdateOperationsInput | number | null
-    tags?: ProductUpdatetagsInput | string[]
     isAvailable?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     options?: ProductOptionUncheckedUpdateManyWithoutProductNestedInput
+    flavors?: ProductFlavorUncheckedUpdateManyWithoutProductNestedInput
     orderItems?: OrderItemUncheckedUpdateManyWithoutProductNestedInput
   }
 
@@ -10367,7 +11763,6 @@ export namespace Prisma {
     imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
     price?: FloatFieldUpdateOperationsInput | number
     promoPrice?: NullableFloatFieldUpdateOperationsInput | number | null
-    tags?: ProductUpdatetagsInput | string[]
     isAvailable?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -10379,12 +11774,19 @@ export namespace Prisma {
     price: number
   }
 
+  export type ProductFlavorCreateManyProductInput = {
+    id?: string
+    name: string
+    price?: number
+  }
+
   export type OrderItemCreateManyProductInput = {
     id?: string
     orderId: string
     productName: string
     quantity: number
     price: number
+    chosenFlavor?: string | null
     chosenOption?: string | null
     observation?: string | null
   }
@@ -10404,10 +11806,26 @@ export namespace Prisma {
     price?: FloatFieldUpdateOperationsInput | number
   }
 
+  export type ProductFlavorUpdateWithoutProductInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    price?: FloatFieldUpdateOperationsInput | number
+  }
+
+  export type ProductFlavorUncheckedUpdateWithoutProductInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    price?: FloatFieldUpdateOperationsInput | number
+  }
+
+  export type ProductFlavorUncheckedUpdateManyWithoutProductInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    price?: FloatFieldUpdateOperationsInput | number
+  }
+
   export type OrderItemUpdateWithoutProductInput = {
     productName?: StringFieldUpdateOperationsInput | string
     quantity?: IntFieldUpdateOperationsInput | number
     price?: FloatFieldUpdateOperationsInput | number
+    chosenFlavor?: NullableStringFieldUpdateOperationsInput | string | null
     chosenOption?: NullableStringFieldUpdateOperationsInput | string | null
     observation?: NullableStringFieldUpdateOperationsInput | string | null
     order?: OrderUpdateOneRequiredWithoutItemsNestedInput
@@ -10418,6 +11836,7 @@ export namespace Prisma {
     productName?: StringFieldUpdateOperationsInput | string
     quantity?: IntFieldUpdateOperationsInput | number
     price?: FloatFieldUpdateOperationsInput | number
+    chosenFlavor?: NullableStringFieldUpdateOperationsInput | string | null
     chosenOption?: NullableStringFieldUpdateOperationsInput | string | null
     observation?: NullableStringFieldUpdateOperationsInput | string | null
   }
@@ -10427,6 +11846,7 @@ export namespace Prisma {
     productName?: StringFieldUpdateOperationsInput | string
     quantity?: IntFieldUpdateOperationsInput | number
     price?: FloatFieldUpdateOperationsInput | number
+    chosenFlavor?: NullableStringFieldUpdateOperationsInput | string | null
     chosenOption?: NullableStringFieldUpdateOperationsInput | string | null
     observation?: NullableStringFieldUpdateOperationsInput | string | null
   }
@@ -10484,6 +11904,7 @@ export namespace Prisma {
     productName: string
     quantity: number
     price: number
+    chosenFlavor?: string | null
     chosenOption?: string | null
     observation?: string | null
   }
@@ -10492,6 +11913,7 @@ export namespace Prisma {
     productName?: StringFieldUpdateOperationsInput | string
     quantity?: IntFieldUpdateOperationsInput | number
     price?: FloatFieldUpdateOperationsInput | number
+    chosenFlavor?: NullableStringFieldUpdateOperationsInput | string | null
     chosenOption?: NullableStringFieldUpdateOperationsInput | string | null
     observation?: NullableStringFieldUpdateOperationsInput | string | null
     product?: ProductUpdateOneRequiredWithoutOrderItemsNestedInput
@@ -10502,6 +11924,7 @@ export namespace Prisma {
     productName?: StringFieldUpdateOperationsInput | string
     quantity?: IntFieldUpdateOperationsInput | number
     price?: FloatFieldUpdateOperationsInput | number
+    chosenFlavor?: NullableStringFieldUpdateOperationsInput | string | null
     chosenOption?: NullableStringFieldUpdateOperationsInput | string | null
     observation?: NullableStringFieldUpdateOperationsInput | string | null
   }
@@ -10511,6 +11934,7 @@ export namespace Prisma {
     productName?: StringFieldUpdateOperationsInput | string
     quantity?: IntFieldUpdateOperationsInput | number
     price?: FloatFieldUpdateOperationsInput | number
+    chosenFlavor?: NullableStringFieldUpdateOperationsInput | string | null
     chosenOption?: NullableStringFieldUpdateOperationsInput | string | null
     observation?: NullableStringFieldUpdateOperationsInput | string | null
   }
@@ -10548,6 +11972,10 @@ export namespace Prisma {
      * @deprecated Use ProductOptionDefaultArgs instead
      */
     export type ProductOptionArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = ProductOptionDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use ProductFlavorDefaultArgs instead
+     */
+    export type ProductFlavorArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = ProductFlavorDefaultArgs<ExtArgs>
     /**
      * @deprecated Use UserDefaultArgs instead
      */

@@ -10,8 +10,9 @@ export interface CartItem {
   price: number;
   quantity: number;
   image: string | null;
-  observacao?: string;
+  flavor?: string;
   opcao?: string;
+  observacao?: string;
 }
 
 interface CartContextType {
@@ -57,7 +58,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
       const existingItemIndex = prev.findIndex(item =>
         item.id === newItem.id &&
         item.opcao === newItem.opcao &&
-        item.observacao === newItem.observacao
+        item.observacao === newItem.observacao &&
+        item.flavor === newItem.flavor
       );
 
       if (existingItemIndex > -1) {

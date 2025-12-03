@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { createOrder, getUserByPhone } from "@/app/actions/order";
+import FullScreenLoader from "@/components/FuillScreenLoader";
 import {
     Trash2, Plus, Minus, ArrowLeft, MessageCircle,
     MapPin, User, CreditCard, Search, Store, Bike, Loader2, Phone, Check, AlertCircle, Sparkles,
@@ -21,6 +22,7 @@ export default function CarrinhoPage() {
     const [telefone, setTelefone] = useState("");
     const [tipoEntrega, setTipoEntrega] = useState<"DELIVERY" | "PICKUP">("DELIVERY");
     const [metodoPagamento, setMetodoPagamento] = useState("PIX");
+
 
     // Estados de Endereço
     const [cep, setCep] = useState("");
@@ -185,8 +187,17 @@ export default function CarrinhoPage() {
         }
     };
 
-    if (items.length === 0) return <div className="p-10 text-center">Carrinho Vazio <Link href="/main" className="underline">Voltar</Link></div>;
+    if (loading) {
+        return <FullScreenLoader />;
+    }
 
+    if (items.length === 0) {
+        return (
+            <div className="min-h-screen bg-[#FDFBF7] flex flex-col items-center justify-center p-4">
+                <div className="p-10 text-center">Carrinho Vazio <Link href="/main" className="underline">Voltar</Link></div>
+            </div>
+        );
+    }
     return (
         <div className="min-h-screen bg-[#FDFBF7] py-8 px-4 sm:px-6 lg:px-8">
             <div className="max-w-6xl mx-auto">
@@ -197,21 +208,62 @@ export default function CarrinhoPage() {
                     {/* ESQUERDA: Resumo */}
                     <div className="lg:col-span-7 space-y-6">
                         <div className="bg-white p-6 rounded-2xl shadow-sm border border-amber-100">
-                            <h2 className="font-bold text-lg mb-4">Resumo do Pedido</h2>
-                            {items.map(item => (
-                                <div key={item.tempId} className="flex justify-between border-b border-gray-100 py-3 last:border-0">
-                                    <div>
-                                        {item.image ? (
-                                            <Image src={item.image} alt={item.name} width={50} height={50} className="w-12 h-12 object-cover rounded-lg inline-block mr-3" />
-                                        ) : (<div className="w-12 h-12 bg-amber-50 rounded-lg inline-block mr-3 flex items-center justify-center text-2xl">
-                                            🍫
-                                        </div>)}
-                                        <span className="font-bold">{item.quantity}x</span> {item.name}
-                                        {item.opcao && <span className="text-xs text-gray-500 ml-2">({item.opcao})</span>}
+                            <h2 className="font-bold text-lg mb-4 text-chocolate-900">Resumo do Pedido</h2>
+
+                            <div className="space-y-4">
+                                {items.map(item => (
+                                    <div key={item.tempId} className="flex gap-4 border-b border-gray-100 pb-4 last:border-0 last:pb-0">
+
+                                        {/* Imagem Pequena (Opcional, mas ajuda a identificar) */}
+                                        <div className="w-16 h-16 bg-amber-50 rounded-lg shrink-0 overflow-hidden relative border border-amber-100 hidden sm:block">
+                                            {item.image ? (
+                                                <Image src={item.image} alt={item.name} fill className="object-cover" />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center text-xl">🍫</div>
+                                            )}
+                                        </div>
+
+                                        <div className="flex-1 min-w-0"> {/* min-w-0 é segredo para texto truncado em flex */}
+                                            <div className="flex justify-between items-start gap-2">
+                                                <div className="font-medium text-chocolate-900">
+                                                    <span className="font-bold mr-1">{item.quantity}x</span>
+                                                    {item.name}
+                                                </div>
+                                                <div className="font-bold text-chocolate-900 whitespace-nowrap">
+                                                    {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.price * item.quantity)}
+                                                </div>
+                                            </div>
+
+                                            {/* Detalhes do Item */}
+                                            <div className="mt-1 space-y-1">
+
+                                                {/* Sabor */}
+                                                {item.flavor && (
+                                                    <div className="text-xs font-bold text-purple-700 flex items-center gap-1">
+                                                        <span className="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
+                                                        Sabor: {item.flavor}
+                                                    </div>
+                                                )}
+
+                                                {/* Opção / Adicional */}
+                                                {item.opcao && (
+                                                    <div className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded w-fit">
+                                                        + {item.opcao}
+                                                    </div>
+                                                )}
+
+                                                {/* Observação (NOVO) */}
+                                                {item.observacao && (
+                                                    <div className="text-xs text-gray-500 italic bg-amber-50 border border-amber-100 p-2 rounded-lg mt-2 flex gap-2">
+                                                        <span className="font-bold not-italic text-amber-600">Obs:</span>
+                                                        "{item.observacao}"
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div>{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.price * item.quantity)}</div>
-                                </div>
-                            ))}
+                                ))}
+                            </div>
                         </div>
                     </div>
 
@@ -286,7 +338,7 @@ export default function CarrinhoPage() {
                                             type="tel" // Ajuda no teclado mobile
                                             value={telefone}
                                             onChange={handlePhoneChange}
-                                            onBlur={() => { handlePhoneBlur(); userFound ? handleBuscarCep() : null; }}
+                                            onBlur={handlePhoneBlur}
                                             className={`w-full rounded-lg border p-3 text-sm outline-none focus:ring-2 transition-all 
                                             ${phoneError ? 'border-red-400 focus:ring-red-200 bg-red-50' :
                                                     userFound ? 'border-green-500 bg-green-50 focus:ring-green-200' :

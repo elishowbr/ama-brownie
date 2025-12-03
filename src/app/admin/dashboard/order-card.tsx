@@ -26,6 +26,7 @@ interface OrderProps {
             quantity: number;
             productName: string;
             chosenOption: string | null;
+            chosenFlavor: string | null;
             observation: string | null;
         }[];
     };
@@ -106,7 +107,7 @@ export default function OrderCard({ order }: OrderProps) {
         <div className={`
         group relative flex flex-col bg-white rounded-2xl border transition-all duration-300 h-full
         ${order.status === 'COMPLETED' ? 'border-gray-100 opacity-80 hover:opacity-100' : 'border-amber-100 shadow-sm hover:shadow-lg hover:-translate-y-1'}
-    `}>
+        `}>
 
             {/* 1. CABEÇALHO DO CARD (Responsivo: Flex-col no mobile, Flex-row no desktop) */}
             <div className="p-4 sm:p-5 pb-3 border-b border-gray-50 flex flex-col sm:flex-row justify-between items-start gap-4 sm:gap-0">
@@ -195,21 +196,23 @@ export default function OrderCard({ order }: OrderProps) {
                             </span>
                         </div>
 
-                        {/* Adicionais */}
-                        {item.chosenOption && (
-                            <div className="ml-0 sm:ml-8 text-xs text-gray-500 mt-1 flex items-center gap-1 pl-2 border-l-2 border-gray-100">
-                                <span className="w-1 h-1 rounded-full bg-gray-300"></span>
-                                {item.chosenOption}
+                        {/* VISUALIZAÇÃO DO SABOR (Destaque Roxo) */}
+                        {item.chosenFlavor && (
+                            <div className="ml-0 sm:ml-8 text-xs font-bold text-purple-700 mt-1 flex items-center gap-1">
+                                <span className="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
+                                {item.chosenFlavor}
                             </div>
                         )}
 
-                        {/* OBSERVAÇÃO DESTAQUE */}
-                        {item.observation && (
-                            <div className="mt-1.5 ml-0 sm:ml-8 bg-amber-50 border border-amber-100 text-amber-800 text-xs p-2 rounded-lg italic flex gap-2 items-start">
-                                <span className="font-bold not-italic shrink-0">⚠️</span>
-                                <span className="break-words">"{item.observation}"</span>
+                        {/* VISUALIZAÇÃO DO ADICIONAL (Texto cinza) */}
+                        {item.chosenOption && (
+                            <div className="ml-0 sm:ml-8 text-xs text-gray-500 mt-0.5 flex items-center gap-1 pl-2">
+                                + {item.chosenOption}
                             </div>
                         )}
+
+                        {/* OBSERVAÇÃO */}
+                        {/* ... */}
                     </div>
                 ))}
             </div>

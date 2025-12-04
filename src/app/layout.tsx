@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     locale: "pt_BR",
     images : [
       {
-        url: "/preview.jpg",
+        url: "/preview.jpeg",
         width: 1200,
         height: 630,
         alt: "Ama Brownie"

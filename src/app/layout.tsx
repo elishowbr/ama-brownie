@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     locale: "pt_BR",
     images : [
       {
-        url: "/preview.jpeg",
+        url: "https://ama-brownie.vercel.app/preview.jpeg",
         width: 1200,
         height: 630,
         alt: "Ama Brownie"

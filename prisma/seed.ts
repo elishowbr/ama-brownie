@@ -1,6 +1,5 @@
 import { hash } from 'crypto'
 import { PrismaClient } from '../generated/prisma'
-import { OrderType, PaymentMethod, OrderStatus, Role } from '../generated/prisma'
 import { hashSync } from 'bcryptjs'
 
 const prisma = new PrismaClient()

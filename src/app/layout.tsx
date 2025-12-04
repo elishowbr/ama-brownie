@@ -5,7 +5,28 @@ import CartSidebar from "@/components/CartSidebar";
 
 export const metadata: Metadata = {
   title: "Ama Brownie",
-  description: "A melhor doceria da cidade",
+  description: "O melhor brownie do mundo!",
+  authors : [{ name: "Ama Brownie" }],
+  keywords : [ "doceria", "brownie", "sobremesa", "chocolate", "bolo", "doce", "gourmet", "artesanal", "delícia", "confeitaria", "sobremesas", "guloseimas", "presentes", "festas", "celebrações", "culinária", "gastronomia", "sabor", "amor", "feito à mão" ],
+  icons : { icon: "icon", href: "/favicon.ico" },
+  robots : {
+    index: true,
+    follow: true,},
+  openGraph : {
+    title: "Ama Brownie",
+    description: "O melhor brownie do mundo!",
+    siteName: "Ama Brownie",
+    type: "website",
+    locale: "pt_BR",
+    images : [
+      {
+        url: "/preview.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Ama Brownie"
+      }
+    ]
+  }
 };
 
 export default function RootLayout({

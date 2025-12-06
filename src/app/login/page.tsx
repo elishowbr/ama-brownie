@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { checkUserRole, authenticateUser } from "@/app/api/auth/login/route";
+import { checkUserRole, authenticateUser } from "@/app/actions/login";
 import { Loader2, Phone, Lock, ArrowRight, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";

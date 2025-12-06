@@ -8,13 +8,21 @@ import { useRouter } from "next/navigation";
 import { createOrder, getUserByPhone } from "@/app/actions/order";
 import FullScreenLoader from "@/components/FullScreenLoader";
 import {
-    Trash2, Plus, Minus, ArrowLeft, MessageCircle,
-    MapPin, User, CreditCard, Search, Store, Bike, Loader2, Phone, Check, AlertCircle, Sparkles,
-    Calendar, Clock, AlertTriangle, ChefHat
+    Plus, Minus, ArrowLeft, MessageCircle,
+    User, CreditCard, Search, Store, Bike, Loader2, Phone, Check, AlertCircle, Sparkles,
+    Clock, AlertTriangle, ChefHat
 } from "lucide-react";
 
+// Mapa de pagamento para exibição amigável
+const paymentOptions = [
+    { value: "PIX", label: "Pagamento via PIX" },
+    { value: "CREDIT_CARD", label: "Cartão de Crédito (Máquina)" },
+    { value: "DEBIT_CARD", label: "Cartão de Débito (Máquina)" },
+    { value: "CASH", label: "Dinheiro" },
+];
+
 export default function CarrinhoPage() {
-    const { items, removeFromCart, cartTotal, addToCart, increaseItem, decreaseItem, clearCart } = useCart();
+    const { items, cartTotal, increaseItem, decreaseItem, clearCart } = useCart();
     const router = useRouter();
 
     // --- ESTADOS DO FORMULÁRIO ---
@@ -31,8 +39,7 @@ export default function CarrinhoPage() {
     const [cidade, setCidade] = useState("");
     const [complemento, setComplemento] = useState("");
 
-    // --- ESTADOS DE AGENDAMENTO ---
-    const [agendarPedido, setAgendarPedido] = useState(false);
+    // --- ESTADOS DE AGENDAMENTO (AGORA OBRIGATÓRIOS) ---
     const [dataAgendamento, setDataAgendamento] = useState("");
     const [horaAgendamento, setHoraAgendamento] = useState("");
 
@@ -70,7 +77,7 @@ export default function CarrinhoPage() {
     const handlePhoneBlur = async () => {
         const rawPhone = telefone.replace(/\D/g, "");
         if (rawPhone.length < 10) {
-            setPhoneError("Telefone inválido. Digite o DDD + Número.");
+            setPhoneError("Telefone inválido.");
             return;
         }
 
@@ -123,24 +130,23 @@ export default function CarrinhoPage() {
 
     // --- FINALIZAR PEDIDO ---
     const handleCheckout = async () => {
+        // Validações Básicas
         if (!nome || !telefone) { alert("Preencha nome e telefone!"); return; }
         if (tipoEntrega === "DELIVERY" && (!rua || !numero || !bairro)) { alert("Endereço incompleto!"); return; }
         if (phoneError) { alert("Corrija o telefone antes de continuar."); return; }
 
-        // Validação de Agendamento
-        let dataISO = null;
-        if (agendarPedido) {
-            if (!dataAgendamento || !horaAgendamento) {
-                alert("Selecione data e hora para o agendamento.");
-                return;
-            }
-            const dataCombinada = new Date(`${dataAgendamento}T${horaAgendamento}`);
-            if (dataCombinada < new Date()) {
-                alert("Data de agendamento inválida (passado).");
-                return;
-            }
-            dataISO = dataCombinada.toISOString();
+        // Validação de Agendamento (OBRIGATÓRIO)
+        if (!dataAgendamento || !horaAgendamento) {
+            alert("Como trabalhamos sob encomenda, é necessário agendar a data e hora da entrega/retirada!");
+            return;
         }
+
+        const dataCombinada = new Date(`${dataAgendamento}T${horaAgendamento}`);
+        if (dataCombinada < new Date()) {
+            alert("A data do agendamento não pode ser no passado.");
+            return;
+        }
+        const dataISO = dataCombinada.toISOString();
 
         setLoading(true);
 
@@ -155,7 +161,7 @@ export default function CarrinhoPage() {
             address: enderecoFormatado,
             paymentMethod: metodoPagamento as any,
             total: cartTotal,
-            scheduledTo: dataISO,
+            scheduledTo: dataISO, // Sempre enviado
             items: items
         };
 
@@ -163,7 +169,7 @@ export default function CarrinhoPage() {
 
         if (result.success) {
             clearCart();
-            router.push(`/pedido/sucesso/${result.orderId}`);
+            router.push(`/carrinho/sucesso/${result.orderId}`);
         } else {
             alert("Erro ao enviar pedido: " + result.error);
             setLoading(false);
@@ -192,7 +198,7 @@ export default function CarrinhoPage() {
         <div className="min-h-screen bg-[#FDFBF7] py-8 px-4 sm:px-6 lg:px-8">
             <div className="max-w-6xl mx-auto">
 
-                {/* Header Simples */}
+                {/* Header */}
                 <div className="flex items-center gap-4 mb-8">
                     <Link href="/" className="p-2 hover:bg-amber-100 rounded-full transition-colors text-chocolate-900">
                         <ArrowLeft className="w-6 h-6" />
@@ -209,7 +215,6 @@ export default function CarrinhoPage() {
                             <div className="space-y-4">
                                 {items.map(item => (
                                     <div key={item.tempId} className="flex gap-4 border-b border-gray-100 pb-4 last:border-0 last:pb-0">
-
                                         {/* Imagem */}
                                         <div className="w-16 h-16 bg-amber-50 rounded-lg shrink-0 overflow-hidden relative border border-amber-100 hidden sm:block">
                                             {item.image ? (
@@ -218,7 +223,6 @@ export default function CarrinhoPage() {
                                                 <div className="w-full h-full flex items-center justify-center text-xl">🍫</div>
                                             )}
                                         </div>
-
                                         <div className="flex-1 min-w-0">
                                             <div className="flex justify-between items-start gap-2">
                                                 <div className="font-medium text-chocolate-900">
@@ -229,7 +233,6 @@ export default function CarrinhoPage() {
                                                     {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.price * item.quantity)}
                                                 </div>
                                             </div>
-
                                             {/* Detalhes */}
                                             <div className="mt-1 space-y-1">
                                                 {item.flavor && (
@@ -271,35 +274,33 @@ export default function CarrinhoPage() {
                                 </button>
                             </div>
 
-                            {/* 2. AGENDAMENTO */}
-                            <div className="space-y-3 pt-2">
-                                <label className="text-sm font-medium text-gray-700 flex items-center gap-2 mb-1">
-                                    <Clock className="w-4 h-4" /> Quando você quer receber?
+                            {/* 2. AGENDAMENTO (OBRIGATÓRIO) */}
+                            <div className="space-y-3 pt-2 border-b border-gray-100 pb-6">
+                                <label className="text-sm font-bold text-chocolate-900 flex items-center gap-2 mb-1">
+                                    <Clock className="w-4 h-4 text-caramelo-600" />
+                                    Agendamento do 'Pedido'
                                 </label>
-                                <div className="flex gap-3 bg-gray-100 p-1 rounded-xl">
-                                    <button onClick={() => setAgendarPedido(false)} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${!agendarPedido ? 'bg-white text-chocolate-900 shadow-sm' : 'text-gray-500'}`}>Agora</button>
-                                    <button onClick={() => setAgendarPedido(true)} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${agendarPedido ? 'bg-white text-chocolate-900 shadow-sm' : 'text-gray-500'}`}>Agendar</button>
-                                </div>
-                                {agendarPedido && (
-                                    <div className="grid grid-cols-2 gap-3 animate-fadeIn bg-amber-50 p-4 rounded-xl border border-amber-100">
-                                        <div>
-                                            <label className="text-xs font-bold text-chocolate-900 mb-1 block">Dia</label>
-                                            <input type="date" value={dataAgendamento} onChange={(e) => setDataAgendamento(e.target.value)} min={new Date().toISOString().split('T')[0]} className="w-full rounded-lg border-amber-200 p-2 text-sm focus:ring-2 focus:ring-chocolate-900 outline-none" />
-                                        </div>
-                                        <div>
-                                            <label className="text-xs font-bold text-chocolate-900 mb-1 block">Hora</label>
-                                            <input type="time" value={horaAgendamento} onChange={(e) => setHoraAgendamento(e.target.value)} className="w-full rounded-lg border-amber-200 p-2 text-sm focus:ring-2 focus:ring-chocolate-900 outline-none" />
-                                        </div>
-                                        <div className="col-span-2 flex items-start gap-2 text-xs text-amber-800 bg-white p-2 rounded border border-amber-100">
-                                            <AlertTriangle className="w-3 h-3 mt-0.5 shrink-0" />
-                                            <span>Sujeito à disponibilidade da cozinha.</span>
-                                        </div>
+                                <p className="text-xs text-gray-500 mb-3">Trabalhamos apenas sob encomenda. Escolha o horário ideal.</p>
+
+                                <div className="grid grid-cols-2 gap-3 bg-amber-50 p-4 rounded-xl border border-amber-100">
+                                    <div>
+                                        <label className="text-xs font-bold text-chocolate-900 mb-1 block">Dia</label>
+                                        <input type="date" value={dataAgendamento} onChange={(e) => setDataAgendamento(e.target.value)} min={new Date().toISOString().split('T')[0]} className="w-full rounded-lg border-amber-200 p-2 text-sm focus:ring-2 focus:ring-chocolate-900 outline-none bg-white" />
                                     </div>
-                                )}
+                                    <div>
+                                        <label className="text-xs font-bold text-chocolate-900 mb-1 block">Hora</label>
+                                        <input type="time" value={horaAgendamento} onChange={(e) => setHoraAgendamento(e.target.value)} className="w-full rounded-lg border-amber-200 p-2 text-sm focus:ring-2 focus:ring-chocolate-900 outline-none bg-white" />
+                                    </div>
+                                    <div className="col-span-2 flex items-start gap-2 text-xs text-amber-800 bg-white p-2 rounded border border-amber-100 mt-1">
+                                        <AlertTriangle className="w-3 h-3 mt-0.5 shrink-0" />
+                                        <span>Sujeito à disponibilidade da cozinha no horário.</span>
+                                    </div>
+                                </div>
                             </div>
 
                             {/* 3. DADOS DO CLIENTE */}
                             <div className="space-y-4">
+                                {/* Telefone */}
                                 <div>
                                     <label className="text-sm font-medium text-gray-700 flex items-center gap-2 mb-1">
                                         <Phone className="w-4 h-4" /> Telefone (WhatsApp)
@@ -331,6 +332,7 @@ export default function CarrinhoPage() {
                             {/* 4. ENDEREÇO */}
                             {tipoEntrega === "DELIVERY" ? (
                                 <div className="space-y-4 animate-fadeIn border-t border-gray-100 pt-4">
+                                    {/* ... Inputs de Endereço ... */}
                                     <div className="flex gap-3 items-end">
                                         <div className="flex-1">
                                             <label className="text-sm font-medium text-gray-700 mb-1 block">CEP</label>
@@ -341,18 +343,26 @@ export default function CarrinhoPage() {
                                         </div>
                                         <div className="pb-3 text-xs text-blue-600 underline"><a href="https://buscacepinter.correios.com.br/app/endereco/index.php" target="_blank">Não sei meu CEP</a></div>
                                     </div>
-
                                     <div className="grid grid-cols-4 gap-3">
                                         <div className="col-span-3"><input type="text" value={rua} onChange={e => setRua(e.target.value)} placeholder="Rua" className="w-full rounded-lg border-gray-200 bg-gray-50 p-3 text-sm" /></div>
                                         <div className="col-span-1"><input ref={numeroInputRef} type="text" value={numero} onChange={e => setNumero(e.target.value)} placeholder="Nº" className="w-full rounded-lg border-gray-200 bg-gray-50 p-3 text-sm" /></div>
                                     </div>
-
                                     <div className="grid grid-cols-2 gap-3">
                                         <input type="text" value={bairro} onChange={e => setBairro(e.target.value)} placeholder="Bairro" className="w-full rounded-lg border-gray-200 bg-gray-50 p-3 text-sm" />
                                         <input type="text" value={cidade} readOnly className="w-full rounded-lg border-gray-200 bg-gray-100 p-3 text-sm cursor-not-allowed" />
                                     </div>
                                     <input type="text" value={complemento} onChange={e => setComplemento(e.target.value)} placeholder="Complemento (Opcional)" className="w-full rounded-lg border-gray-200 bg-gray-50 p-3 text-sm" />
 
+                                    {/* AVISO FRETE */}
+                                    <div className="bg-orange-50 border border-orange-100 rounded-xl p-4 flex gap-3 items-start mt-2">
+                                        <div className="bg-orange-100 p-2 rounded-full text-orange-700 shrink-0 mt-0.5"><Bike className="w-5 h-5" /></div>
+                                        <div>
+                                            <h3 className="text-sm font-bold text-orange-900">Entrega por Uber Flash</h3>
+                                            <p className="text-xs text-orange-800/90 mt-1 leading-relaxed">
+                                                O custo da entrega é <strong>por conta do cliente</strong>. Cotaremos o valor exato no WhatsApp após a confirmação.
+                                            </p>
+                                        </div>
+                                    </div>
                                 </div>
                             ) : (
                                 <div className="bg-amber-50 border border-amber-100 rounded-xl p-4 text-center animate-fadeIn mt-4">
@@ -363,37 +373,30 @@ export default function CarrinhoPage() {
                                 </div>
                             )}
 
-                            {/* AVISO DE PRODUÇÃO */}
+                            {/* AVISO PRODUÇÃO */}
                             <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 flex gap-3 items-start animate-fadeIn">
                                 <div className="bg-blue-100 p-2 rounded-full text-blue-700 shrink-0 mt-0.5"><ChefHat className="w-5 h-5" /></div>
                                 <div>
                                     <h3 className="text-sm font-bold text-blue-900">Produção Artesanal</h3>
                                     <p className="text-xs text-blue-700/90 mt-1 leading-relaxed">
-                                        Você receberá atualizações sobre a produção do seu pedido (Preparação, Saída) diretamente no seu <strong>WhatsApp</strong>.
-                                    </p>
-                                </div>
-                            </div>
-
-                            {/* AVISO DE FRETE */}
-                            <div className="bg-orange-50 border border-orange-100 rounded-xl p-4 flex gap-3 items-start mt-2">
-                                <div className="bg-orange-100 p-2 rounded-full text-orange-700 shrink-0 mt-0.5"><Bike className="w-5 h-5" /></div>
-                                <div>
-                                    <h3 className="text-sm font-bold text-orange-900">Entrega por Uber Flash</h3>
-                                    <p className="text-xs text-orange-800/90 mt-1 leading-relaxed">
-                                        O custo da entrega é <strong>por conta do cliente</strong>. Cotaremos o valor exato no WhatsApp após a confirmação.
+                                        Confirmaremos seu pedido e status de produção pelo <strong>WhatsApp</strong>.
                                     </p>
                                 </div>
                             </div>
 
                             {/* 5. PAGAMENTO */}
                             <div>
-                                <label className="text-sm font-medium text-gray-700 flex items-center gap-2 mb-1"><CreditCard className="w-4 h-4" /> Pagamento</label>
-                                <select value={metodoPagamento} onChange={e => setMetodoPagamento(e.target.value)} className="w-full rounded-lg border-gray-200 bg-gray-50 p-3 text-sm outline-none">
-                                    <option value="PIX">PIX</option>
-                                    <option value="CREDIT_CARD">Cartão de Crédito</option>
-                                    <option value="DEBIT_CARD">Cartão de Débito</option>
-                                    <option value="CASH">Dinheiro</option>
-                                </select>
+                                <label className="text-sm font-medium text-gray-700 flex items-center gap-2 mb-1"><CreditCard className="w-4 h-4" /> Forma de Pagamento</label>
+                                <div className="relative">
+                                    <select value={metodoPagamento} onChange={e => setMetodoPagamento(e.target.value)} className="w-full rounded-lg border-gray-200 bg-gray-50 p-3 text-sm outline-none appearance-none cursor-pointer hover:bg-gray-100 transition-colors focus:ring-2 focus:ring-chocolate-900">
+                                        {paymentOptions.map(opt => (
+                                            <option key={opt.value} value={opt.value}>{opt.label}</option>
+                                        ))}
+                                    </select>
+                                    <div className="absolute right-3 top-3.5 pointer-events-none text-gray-500">
+                                        <svg width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                                    </div>
+                                </div>
                             </div>
 
                             {/* TOTAL E BOTÃO */}
@@ -403,7 +406,7 @@ export default function CarrinhoPage() {
                                     <span className="text-2xl font-serif font-bold text-chocolate-900">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(cartTotal)}</span>
                                 </div>
                                 <button onClick={handleCheckout} disabled={loading} className="w-full py-4 bg-green-600 hover:bg-green-700 text-white rounded-xl font-bold text-lg flex items-center justify-center gap-2 shadow-lg disabled:opacity-70 disabled:cursor-not-allowed">
-                                    {loading ? <Loader2 className="animate-spin" /> : <><MessageCircle className="w-5 h-5" /> Confirmar Pedido</>}
+                                    {loading ? <Loader2 className="animate-spin" /> : <><MessageCircle className="w-5 h-5" /> Agendar Pedido</>}
                                 </button>
                             </div>
 

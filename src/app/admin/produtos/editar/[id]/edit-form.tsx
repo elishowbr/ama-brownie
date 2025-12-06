@@ -2,17 +2,19 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Trash2, Plus, Save, ArrowLeft, Loader2, AlertCircle } from "lucide-react";
+import { Trash2, Plus, Save, ArrowLeft, Loader2, AlertCircle, UploadCloud, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { updateProduct } from "@/app/actions/admin"; // Importamos a função de Update
 
-// Tipos para as props
+// --- Tipos para as props ---
+// Se tiver o arquivo types.ts centralizado, pode importar de lá
 interface ProductOption {
-    id?: string; // Opcional pois novas opções não tem ID ainda
+    id?: string;
     name: string;
     price: number;
 }
 
+// Interface que espelha o Prisma GetPayload
 interface ProductData {
     id: string;
     name: string;
@@ -40,24 +42,29 @@ export default function EditProductForm({ product, categories }: EditProductForm
     const [loading, setLoading] = useState(false);
     const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
 
-    // 1. INICIALIZAÇÃO DO ESTADO COM DADOS DO BANCO
-    // Note que convertemos números para string para facilitar a edição no input
+    // 1. ESTADOS DO FORMULÁRIO
     const [formData, setFormData] = useState({
         name: product.name,
         description: product.description || "",
         price: product.price.toString(),
         promoPrice: product.promoPrice ? product.promoPrice.toString() : "",
         categoryId: product.categoryId,
-        imageUrl: product.imageUrl || "",
+        imageUrl: product.imageUrl || "", // URL antiga vinda do banco
     });
 
-    // Inicializa as opções vindas do banco
+    // 2. ESTADOS DE IMAGEM (NOVO)
+    const [imageFile, setImageFile] = useState<File | null>(null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(product.imageUrl || null); // Começa com a imagem do banco
+
+    // 3. ESTADOS DE ARRAYS
     const [options, setOptions] = useState<ProductOption[]>(
         product.options.map(opt => ({ name: opt.name, price: opt.price }))
     );
     const [flavors, setFlavors] = useState<ProductOption[]>(
         product.flavors.map(flav => ({ name: flav.name, price: flav.price }))
     );
+
+    // --- HANDLERS ---
 
     const handleChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -73,61 +80,80 @@ export default function EditProductForm({ product, categories }: EditProductForm
         }
     };
 
-    const addOption = () => {
-        setOptions([...options, { name: "", price: 0 }]);
+    // Upload de Imagem
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            // Verifica tamanho > 5MB
+            if (file.size > 5 * 1024 * 1024) {
+                alert("Imagem muito grande! Máximo 5MB.");
+                e.target.value = "";
+                return;
+            }
+            setImageFile(file);
+            setPreviewUrl(URL.createObjectURL(file)); // Preview local do novo arquivo
+        }
     };
 
-    const removeOption = (index: number) => {
-        const newOptions = options.filter((_, i) => i !== index);
-        setOptions(newOptions);
+    // Limpar imagem (Se quiser remover a foto existente)
+    // Nota: A lógica no backend precisaria saber que você quer DELETAR a foto. 
+    // Por enquanto, vamos assumir que ele troca ou mantém.
+    const clearImage = () => {
+        setImageFile(null);
+        setPreviewUrl(null);
+        // Opcional: Se quiser permitir salvar sem foto, teria que passar uma flag pro backend
     };
 
+    // --- ARRAYS (Options / Flavors) ---
+    const addOption = () => setOptions([...options, { name: "", price: 0 }]);
+    const removeOption = (index: number) => setOptions(options.filter((_, i) => i !== index));
     const updateOptionState = (index: number, field: keyof ProductOption, value: string | number) => {
         const newOptions = [...options];
-        newOptions[index] = {
-            ...newOptions[index],
-            [field]: field === "price" ? parseFloat(value.toString()) || 0 : value,
-        };
+        newOptions[index] = { ...newOptions[index], [field]: field === "price" ? parseFloat(value.toString()) || 0 : value };
         setOptions(newOptions);
     };
 
-    const addFlavor = () => {
-        setFlavors([...flavors, { name: "", price: 0 }]);
-    };
-
-    const removeFlavor = (index: number) => {
-        const newFlavors = flavors.filter((_, i) => i !== index);
-        setFlavors(newFlavors);
-    };
-
+    const addFlavor = () => setFlavors([...flavors, { name: "", price: 0 }]);
+    const removeFlavor = (index: number) => setFlavors(flavors.filter((_, i) => i !== index));
     const updateFlavorState = (index: number, field: keyof ProductOption, value: string | number) => {
         const newFlavors = [...flavors];
-        newFlavors[index] = {
-            ...newFlavors[index],
-            [field]: field === "price" ? parseFloat(value.toString()) || 0 : value,
-        };
+        newFlavors[index] = { ...newFlavors[index], [field]: field === "price" ? parseFloat(value.toString()) || 0 : value };
         setFlavors(newFlavors);
     };
 
+    // --- SUBMIT (FORMDATA) ---
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
         setFieldErrors({});
 
         try {
-            const payload = {
-                ...formData,
-                price: parseFloat(formData.price),
-                promoPrice: formData.promoPrice ? parseFloat(formData.promoPrice) : null,
-                options: options.filter((opt) => opt.name.trim() !== ""),
-                flavors: flavors.filter((flav) => flav.name.trim() !== ""),
-            };
+            const dataToSend = new FormData();
 
-            // CHAMADA À SERVER ACTION DE UPDATE
-            // Passamos o ID do produto original + os dados novos
-            const result = await updateProduct(product.id, payload);
+            dataToSend.append("name", formData.name);
+            dataToSend.append("description", formData.description);
+            dataToSend.append("price", formData.price);
+            dataToSend.append("categoryId", formData.categoryId);
+            if (formData.promoPrice) dataToSend.append("promoPrice", formData.promoPrice);
 
-            if (result.error) {
+            // Lógica de Imagem:
+            // 1. Se tem arquivo novo, manda o arquivo.
+            // 2. Se não tem arquivo novo, manda a URL antiga (formData.imageUrl).
+            // O backend vai decidir o que fazer.
+            if (imageFile) {
+                dataToSend.append("imageFile", imageFile);
+            } else if (formData.imageUrl) {
+                dataToSend.append("imageUrl", formData.imageUrl);
+            }
+
+            // Arrays -> String JSON
+            dataToSend.append("options", JSON.stringify(options.filter((opt) => opt.name.trim() !== "")));
+            dataToSend.append("flavors", JSON.stringify(flavors.filter((flav) => flav.name.trim() !== "")));
+
+            // Chama o Update (passando o ID e o FormData)
+            const result = await updateProduct(product.id, null, dataToSend);
+
+            if (result?.error) {
                 if (typeof result.error === 'string') {
                     alert(result.error);
                 } else {
@@ -157,7 +183,7 @@ export default function EditProductForm({ product, categories }: EditProductForm
         );
     };
 
-    // --- RENDERIZAÇÃO (Idêntica ao create, mas título diferente) ---
+    // --- RENDERIZAÇÃO ---
     return (
         <div className="max-w-4xl mx-auto">
             <div className="flex items-center justify-between mb-8">
@@ -179,13 +205,15 @@ export default function EditProductForm({ product, categories }: EditProductForm
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
-                {/* CARD PRINCIPAL */}
+
+                {/* DADOS BÁSICOS */}
                 <div className="bg-white rounded-xl shadow-[0_4px_20px_-4px_rgba(120,53,15,0.1)] border border-amber-100 p-6 md:p-8">
                     <h2 className="text-xl font-semibold text-amber-900 mb-6 border-b border-amber-100 pb-2">
                         Dados Básicos
                     </h2>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
                         {/* Nome */}
                         <div className="md:col-span-2">
                             <label className="block text-sm font-medium text-amber-800 mb-1">Nome</label>
@@ -223,12 +251,35 @@ export default function EditProductForm({ product, categories }: EditProductForm
                             <ErrorMsg field="categoryId" />
                         </div>
 
-                        {/* Imagem */}
+                        {/* --- UPLOAD DE IMAGEM --- */}
                         <div>
-                            <label className="block text-sm font-medium text-amber-800 mb-1">URL Imagem</label>
-                            <input type="text" name="imageUrl" value={formData.imageUrl} onChange={handleChange}
-                                className="w-full rounded-lg border-amber-200 bg-amber-50/30 focus:border-amber-500 p-2.5 text-gray-800" />
-                            <ErrorMsg field="imageUrl" />
+                            <label className="block text-sm font-medium text-amber-800 mb-1">Imagem do Produto</label>
+
+                            <div className={`border-2 border-dashed rounded-xl p-4 transition-colors text-center relative ${previewUrl ? 'border-amber-400 bg-amber-50' : 'border-amber-200 bg-amber-50/30 hover:bg-amber-50 cursor-pointer'}`}>
+
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleImageChange}
+                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                                />
+
+                                {previewUrl ? (
+                                    <div className="relative w-full h-40">
+                                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                                        <img src={previewUrl} alt="Preview" className="w-full h-full object-contain rounded-lg" />
+                                        <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 hover:opacity-100 transition-opacity rounded-lg">
+                                            <p className="text-white text-xs font-bold">Clique para trocar</p>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="flex flex-col items-center justify-center h-32 text-amber-800/60">
+                                        <UploadCloud className="w-8 h-8 mb-2" />
+                                        <span className="text-sm font-medium">Clique para enviar uma foto</span>
+                                        <span className="text-xs">JPG, PNG (Máx 5MB)</span>
+                                    </div>
+                                )}
+                            </div>
                         </div>
 
                         {/* Descrição */}
@@ -240,63 +291,48 @@ export default function EditProductForm({ product, categories }: EditProductForm
                     </div>
                 </div>
 
-                {/* --- NOVO BLOCO: SABORES --- */}
-                <div className="bg-white rounded-xl shadow-sm border border-amber-100 p-6 mb-6">
+                {/* SABORES */}
+                <div className="bg-white rounded-xl shadow-sm border border-amber-100 p-6">
                     <div className="flex justify-between items-center mb-4 border-b border-amber-100 pb-2">
                         <div>
                             <h2 className="text-xl font-semibold text-amber-900">Sabores</h2>
-                            <p className="text-xs text-gray-500">Ex: Nutella, Doce de Leite. Se vazio, será "Tradicional".</p>
+                            <p className="text-xs text-gray-500">Ex: Nutella, Doce de Leite.</p>
                         </div>
-                        <button type="button" onClick={addFlavor} className="text-sm bg-amber-100 text-amber-900 px-3 py-1 rounded hover:bg-amber-200">
-                            + Adicionar
-                        </button>
+                        <button type="button" onClick={addFlavor} className="text-sm bg-amber-100 text-amber-900 px-3 py-1 rounded hover:bg-amber-200">+ Adicionar</button>
                     </div>
-
                     {flavors.map((item, index) => (
                         <div key={index} className="flex gap-4 mb-3 items-end">
                             <div className="flex-1">
-                                <label className="text-xs text-gray-500">Nome do Sabor</label>
-                                <input type="text" value={item.name} onChange={e => updateFlavorState(index, 'name', e.target.value)} className="w-full border rounded p-2 text-sm" placeholder="Ex: Chocolate Belga" />
+                                <input type="text" value={item.name} onChange={e => updateFlavorState(index, 'name', e.target.value)} className="w-full border rounded p-2 text-sm" placeholder="Nome" />
                             </div>
                             <div className="w-32">
-                                <label className="text-xs text-gray-500">Preço Extra</label>
-                                <input type="number" step="0.01" value={item.price} onChange={e => updateFlavorState(index, 'price', e.target.value)} className="w-full border rounded p-2 text-sm" />
+                                <input type="number" step="0.01" value={item.price} onChange={e => updateFlavorState(index, 'price', e.target.value)} className="w-full border rounded p-2 text-sm" placeholder="R$" />
                             </div>
-                            <button type="button" onClick={() => removeFlavor(index)} className="p-2 text-red-400 hover:text-red-600"><Trash2 className="w-5 h-5" /></button>
+                            <button type="button" onClick={() => removeFlavor(index)} className="p-2 text-red-400"><Trash2 className="w-5 h-5" /></button>
                         </div>
                     ))}
-                    {flavors.length === 0 && <p className="text-sm text-gray-400 italic text-center py-2">Nenhum sabor específico (Produto Tradicional)</p>}
                 </div>
 
-                {/* CARD OPÇÕES */}
-                <div className="bg-white rounded-xl shadow-[0_4px_20px_-4px_rgba(120,53,15,0.1)] border border-amber-100 p-6 md:p-8">
-                    <div className="flex items-center justify-between mb-6 border-b border-amber-100 pb-2">
+                {/* OPÇÕES */}
+                <div className="bg-white rounded-xl shadow-sm border border-amber-100 p-6">
+                    <div className="flex justify-between items-center mb-4 border-b border-amber-100 pb-2">
                         <h2 className="text-xl font-semibold text-amber-900">Opções & Adicionais</h2>
-                        <button type="button" onClick={addOption} className="inline-flex items-center px-3 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-900 rounded-md text-sm font-medium">
-                            <Plus className="w-4 h-4 mr-1" /> Adicionar
-                        </button>
+                        <button type="button" onClick={addOption} className="text-sm bg-amber-100 text-amber-900 px-3 py-1 rounded hover:bg-amber-200">+ Adicionar</button>
                     </div>
-                    <div className="space-y-4">
-                        {options.map((option, index) => (
-                            <div key={index} className="flex gap-4 items-end bg-amber-50/50 p-4 rounded-lg border border-amber-100/50">
-                                <div className="flex-grow">
-                                    <label className="text-xs text-amber-800/70">Nome</label>
-                                    <input type="text" value={option.name} onChange={(e) => updateOptionState(index, "name", e.target.value)}
-                                        className="w-full rounded-md border-amber-200 p-2 text-sm bg-white" />
-                                </div>
-                                <div className="w-32">
-                                    <label className="text-xs text-amber-800/70">Preço</label>
-                                    <input type="number" step="0.01" value={option.price} onChange={(e) => updateOptionState(index, "price", e.target.value)}
-                                        className="w-full rounded-md border-amber-200 p-2 text-sm bg-white" />
-                                </div>
-                                <button type="button" onClick={() => removeOption(index)} className="p-2 text-red-400 hover:text-red-600">
-                                    <Trash2 className="w-5 h-5" />
-                                </button>
+                    {options.map((option, index) => (
+                        <div key={index} className="flex gap-4 items-end mb-3">
+                            <div className="flex-grow">
+                                <input type="text" value={option.name} onChange={(e) => updateOptionState(index, "name", e.target.value)} className="w-full border rounded p-2 text-sm" placeholder="Nome" />
                             </div>
-                        ))}
-                    </div>
+                            <div className="w-32">
+                                <input type="number" step="0.01" value={option.price} onChange={(e) => updateOptionState(index, "price", e.target.value)} className="w-full border rounded p-2 text-sm" placeholder="R$" />
+                            </div>
+                            <button type="button" onClick={() => removeOption(index)} className="p-2 text-red-400"><Trash2 className="w-5 h-5" /></button>
+                        </div>
+                    ))}
                 </div>
 
+                {/* BOTÃO SALVAR */}
                 <div className="flex justify-end pt-4 pb-10">
                     <button type="submit" disabled={loading}
                         className="inline-flex items-center px-8 py-3 bg-amber-900 hover:bg-amber-800 text-white rounded-lg shadow-lg hover:shadow-xl disabled:opacity-70 transition-all">

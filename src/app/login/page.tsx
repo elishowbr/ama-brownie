@@ -1,124 +1,164 @@
 "use client";
 
 import { useState } from "react";
+// Mudei o import para apontar para as Server Actions que criamos (não use mais /api/auth...)
+import { checkUserRole, authenticateUser } from "@/app/api/auth/login/route";
+import { Loader2, Phone, Lock, ArrowRight, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 export default function LoginPage() {
-    const router = useRouter();
+    const [step, setStep] = useState<"PHONE" | "PASSWORD">("PHONE");
     const [phone, setPhone] = useState("");
     const [password, setPassword] = useState("");
-    const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
+    const router = useRouter();
 
-    const handleLogin = async (e: React.FormEvent) => {
+    // Máscara de Telefone
+    const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        let val = e.target.value.replace(/\D/g, "");
+        if (val.length > 11) val = val.slice(0, 11);
+        if (val.length > 2) val = `(${val.slice(0, 2)}) ${val.slice(2)}`;
+        if (val.length > 10) val = `${val.slice(0, 10)}-${val.slice(10)}`;
+        else if (val.length > 6) val = `${val.slice(0, 9)}-${val.slice(9)}`;
+        setPhone(val);
+        setError("");
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
         setLoading(true);
 
         try {
-            const res = await fetch("/api/auth/login", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ phone, password }),
-            });
+            if (step === "PHONE") {
+                // PASSO 1: Verificar quem é
+                const result = await checkUserRole(phone);
 
-            const data = await res.json();
+                if (result.error) {
+                    setError(result.error);
+                    setLoading(false);
+                    return;
+                }
 
-            if (!res.ok) {
-                throw new Error(data.error || "Erro ao entrar");
+                if (result.role === 'ADMIN') {
+                    setStep("PASSWORD");
+                    setLoading(false);
+                } else {
+                    await authenticateUser(phone);
+                    router.push("/meus-pedidos");
+                }
+
+            } else {
+                // PASSO 2: Admin
+                const result = await authenticateUser(phone, password);
+                if (result?.error) {
+                    setError(result.error);
+                    setLoading(false);
+                }
             }
-
-            router.push("/admin/dashboard");
-
-        } catch (err: any) {
-            setError(err.message);
-        } finally {
+        } catch (err) {
+            console.error(err);
+            setError("Ocorreu um erro. Tente novamente.");
             setLoading(false);
         }
     };
 
-        const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        let value = e.target.value.replace(/\D/g, ""); // Remove tudo que não é número
-
-        // Limita a 11 dígitos
-        if (value.length > 11) value = value.slice(0, 11);
-
-        // Aplica a máscara (XX) XXXXX-XXXX
-        if (value.length > 2) {
-            value = `(${value.slice(0, 2)}) ${value.slice(2)}`;
-        }
-        if (value.length > 10) {
-            value = `${value.slice(0, 10)}-${value.slice(10)}`;
-        } else if (value.length > 6) { // Ajuste para números fixos ou móveis incompletos
-            value = `${value.slice(0, 9)}-${value.slice(9)}`;
-        }
-
-        setPhone(value);
-
-    };
-
     return (
-        <div className="min-h-screen bg-creme flex items-center justify-center p-4">
-            <div className="bg-white w-full max-w-sm p-8 rounded-3xl shadow-xl border border-caramelo-100 animate-zoomIn">
+        // Usei 'min-h-[100dvh]' para lidar melhor com a barra de endereço móvel
+        <div className="min-h-[100dvh] bg-[#FDFBF7] flex flex-col justify-center items-center p-4 sm:p-6">
 
-                {/* Cabeçalho */}
-                <div className="text-center mb-8">
-                    <div className="w-20 h-20 bg-chocolate-900 rounded-full flex items-center justify-center shadow-lg mx-auto mb-4 border-4 border-caramelo-500 text-3xl">
-                        🔐
-                    </div>
-                    <h1 className="font-serif font-bold text-2xl text-chocolate-900">Acesso Restrito</h1>
-                    <p className="text-chocolate-600 text-sm">Área administrativa da Ama Brownie</p>
+            <div className="w-full max-w-md bg-white rounded-3xl shadow-xl border border-amber-100 overflow-hidden flex flex-col">
+
+                {/* Header */}
+                <div className="bg-chocolate-900 p-6 sm:p-8 text-center shrink-0">
+                    <h1 className="text-xl sm:text-2xl font-serif text-white tracking-wide">AMA BROWNIE</h1>
+                    <p className="text-creme text-xs sm:text-sm mt-1">Checar status do pedido</p>
                 </div>
 
-                {/* Formulário */}
-                <form onSubmit={handleLogin} className="space-y-4">
+                <div className="p-6 sm:p-8 flex-1">
+                    <form onSubmit={handleSubmit} className="space-y-5 flex flex-col h-full justify-center">
 
-                    <div>
-                        <label className="block text-xs font-bold text-chocolate-600 uppercase mb-1 ml-1">Telefone</label>
-                        <input
-                            type="tel"
-                            required
-                            placeholder="5511999999999"
-                            className="w-full p-4 bg-gray-50 border-gray-200 focus:bg-white"
-                            value={phone}
-                            onChange={(e) => { setPhone(e.target.value); handlePhoneChange(e); }}
-                        />
-                    </div>
-
-                    <div>
-                        <label className="block text-xs font-bold text-chocolate-600 uppercase mb-1 ml-1">Senha</label>
-                        <input
-                            type="password"
-                            required
-                            placeholder="••••••"
-                            className="w-full p-4 bg-gray-50 border-gray-200 focus:bg-white"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                        />
-                    </div>
-
-                    {error && (
-                        <div className="bg-red-50 text-red-500 text-sm p-3 rounded-xl text-center border border-red-100">
-                            ⚠️ {error}
+                        {/* Input Telefone */}
+                        <div>
+                            <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 ml-1">Telefone</label>
+                            <div className="relative">
+                                <div className="absolute left-3 top-3.5 text-gray-400 pointer-events-none">
+                                    <Phone className="w-5 h-5" />
+                                </div>
+                                <input
+                                    type="tel" // Importante para abrir teclado numérico
+                                    value={phone}
+                                    onChange={handlePhoneChange}
+                                    disabled={step === "PASSWORD"}
+                                    className={`w-full pl-10 pr-4 py-3 rounded-xl border bg-gray-50 outline-none transition-all text-base ${step === 'PASSWORD' ? 'text-gray-400 bg-gray-100 cursor-not-allowed' : 'focus:ring-2 focus:ring-chocolate-900 focus:bg-white'}`}
+                                    placeholder="(00) 00000-0000"
+                                />
+                                {step === "PASSWORD" && (
+                                    <button
+                                        type="button"
+                                        onClick={() => { setStep("PHONE"); setPassword(""); setError(""); }}
+                                        className="absolute right-3 top-3.5 text-xs text-blue-600 hover:underline font-bold bg-white/80 px-2 py-0.5 rounded"
+                                    >
+                                        Alterar
+                                    </button>
+                                )}
+                            </div>
                         </div>
-                    )}
 
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className={`w-full bg-chocolate-900 text-white font-bold py-4 rounded-xl shadow-lg transition-all active:scale-95 ${loading ? 'opacity-70 cursor-not-allowed' : 'hover:bg-chocolate-800'}`}
-                    >
-                        {loading ? "Entrando..." : "Acessar Painel"}
-                    </button>
-                </form>
+                        {/* Input Senha */}
+                        {step === "PASSWORD" && (
+                            <div className="animate-fadeIn">
+                                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 ml-1">Senha de Admin</label>
+                                <div className="relative">
+                                    <div className="absolute left-3 top-3.5 text-gray-400 pointer-events-none">
+                                        <Lock className="w-5 h-5" />
+                                    </div>
+                                    <input
+                                        type="password"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        autoFocus
+                                        className="w-full pl-10 pr-4 py-3 rounded-xl border bg-gray-50 outline-none focus:ring-2 focus:ring-chocolate-900 focus:bg-white transition-all text-base"
+                                        placeholder="••••••"
+                                    />
+                                </div>
+                                <p className="text-xs text-center text-gray-500 mt-3 bg-amber-50 p-2.5 rounded-lg leading-relaxed border border-amber-100">
+                                    <span className="font-bold block text-amber-800 mb-0.5">Área Restrita</span>
+                                    Identificamos que você é um administrador. Por segurança, insira sua senha.
+                                </p>
+                            </div>
+                        )}
 
-                <div className="mt-6 text-center">
-                    <Link href="/" className="text-sm text-caramelo-500 hover:text-chocolate-900 transition-colors">
+                        {/* Mensagem de Erro */}
+                        {error && (
+                            <div className="p-3 bg-red-50 text-red-600 text-sm rounded-lg text-center font-medium border border-red-100 animate-pulse">
+                                {error}
+                            </div>
+                        )}
+
+                        {/* Botão (Margin Auto empurra pro final se precisar) */}
+                        <div className="mt-auto pt-2">
+                            <button
+                                type="submit"
+                                disabled={loading || phone.length < 14}
+                                className="w-full bg-chocolate-900 hover:bg-chocolate-800 text-white font-bold py-4 sm:py-3.5 rounded-xl shadow-lg shadow-chocolate-900/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                            >
+                                {loading ? (
+                                    <Loader2 className="w-5 h-5 animate-spin" />
+                                ) : step === "PHONE" ? (
+                                    <>Continuar <ArrowRight className="w-5 h-5" /></>
+                                ) : (
+                                    <>Entrar no Painel <User className="w-5 h-5" /></>
+                                )}
+                            </button>
+                        </div>
+                    </form>
+                    <Link href="/" className="text-sm text-gray-500 hover:underline mt-4 inline-block text-center w-full">
                         Voltar
                     </Link>
                 </div>
-
             </div>
         </div>
     );

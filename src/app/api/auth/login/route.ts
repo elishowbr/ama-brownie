@@ -1,36 +1,50 @@
-import { NextResponse } from "next/server";
-import { compare } from "bcryptjs"; 
-import { createSession } from "@/lib/auth"; 
-import { prisma } from "@/prisma";
+"use server";
 
-export async function POST(request: Request) {
-    try {
-        const { phone, password } = await request.json();
+import { prisma } from "@/prisma"; // Ajuste seu import do prisma
+import { createSession } from "@/lib/auth"; // Use o arquivo de sessão que criamos antes
+import { compare } from "bcryptjs";
+import { redirect } from "next/navigation";
 
-        const user = await prisma.user.findUnique({
-            where: { phone }
-        });
+// 1. Verifica quem é o usuário pelo telefone
+export async function checkUserRole(phone: string) {
+    const user = await prisma.user.findUnique({
+        where: { phone },
+        select: { id: true, role: true } // Só precisamos saber isso por enquanto
+    });
 
-        if (!user || !user.password) {
-            return NextResponse.json({ error: "Credenciais inválidas" }, { status: 401 });
-        }
+    if (!user) {
+        return { error: "Telefone não cadastrado." };
+    }
 
-        const isPasswordValid = await compare(password, user.password);
+    return { success: true, role: user.role, userId: user.id };
+}
 
-        if (!isPasswordValid) {
-            return NextResponse.json({ error: "Credenciais inválidas" }, { status: 401 });
-        }
+// 2. Realiza o login (Com senha para Admin, direto para Cliente)
+export async function authenticateUser(phone: string, password?: string) {
+    const user = await prisma.user.findUnique({
+        where: { phone }
+    });
 
-        if (user.role !== 'ADMIN') {
-            return NextResponse.json({ error: "Acesso restrito a administradores" }, { status: 403 });
-        }
+    if (!user) return { error: "Usuário não encontrado" };
 
-        await createSession(user.id, user.role);
+    // LÓGICA DO ADMIN (Exige Senha)
+    if (user.role === 'ADMIN') {
+        if (!password) return { error: "Senha obrigatória para administradores." };
 
-        return NextResponse.json({ success: true });
+        const isValid = await compare(password, user.password || "");
+        if (!isValid) return { error: "Senha incorreta." };
+    }
 
-    } catch (error) {
-        console.error(error);
-        return NextResponse.json({ error: "Erro interno" }, { status: 500 });
+    // LÓGICA DO CLIENTE (Não exige senha, login suave)
+    // Se chegou aqui, ou é Cliente, ou é Admin com senha correta.
+
+    // Cria a sessão (Cookie)
+    await createSession(user.id, user.role);
+
+    // Redireciona baseado no cargo
+    if (user.role === 'ADMIN') {
+        redirect("/admin/dashboard");
+    } else {
+        redirect("/meus-pedidos");
     }
 }

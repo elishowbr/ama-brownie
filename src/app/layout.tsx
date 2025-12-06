@@ -2,6 +2,19 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { CartProvider } from "@/context/CartContext";
 import CartSidebar from "@/components/CartSidebar";
+import { Poppins, Antic_Didone } from "next/font/google";
+
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--poppins",
+});
+
+const anticDidone = Antic_Didone({
+  subsets: ["latin"],
+  weight: ["400"],
+  variable: "--antic-didone",
+});
 
 export const metadata: Metadata = {
   title: "Ama Brownie",
@@ -36,7 +49,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR">
-      <body>
+      <body className={`${poppins.variable} ${anticDidone.variable}`}>
         <CartProvider>
           {children}
           <CartSidebar />

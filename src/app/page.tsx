@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Home() {
   return (
@@ -13,12 +14,18 @@ export default function Home() {
 
         <div className="flex flex-col items-center md:items-start max-w-lg w-full md:pl-20">
           {/* LOGO */}
-          <div className="w-32 h-32 bg-chocolate-900 rounded-full flex items-center justify-center shadow-xl mb-6 border-4 border-caramelo-500 md:w-40 md:h-40 shrink-0">
-            <span className="text-4xl md:text-6xl">🍫</span>
+          <div className="w-32 h-32 bg-chocolate-900 rounded-full flex items-center justify-center shadow-xl mb-6 border-4 border-caramelo-500 md:w-40 md:h-40 shrink-0 relative overflow-hidden"> {/* 2. Adicione relative e overflow-hidden aqui */}
+            <Image
+              src="/images/ama-logo.png"
+              alt="Logo Ama Brownie"
+              fill
+              className="object-cover"
+              priority
+            />
           </div>
 
           {/* TÍTULO */}
-          <h1 className="text-4xl md:text-6xl font-serif font-bold text-chocolate-900 tracking-wide leading-tight text-center md:text-left">
+          <h1 className="text-4xl md:text-6xl font-[antic-didone] text-chocolate-900 tracking-wide leading-tight text-center md:text-left">
             AMA <br className="hidden md:block" /> BROWNIE
           </h1>
           <p className="text-chocolate-600 mt-4 text-lg italic md:text-xl text-center md:text-left">
@@ -39,7 +46,7 @@ export default function Home() {
               href="/login"
               className="w-full bg-transparent hover:bg-caramelo-100 text-chocolate-900 font-bold py-4 px-6 rounded-2xl border-2 border-chocolate-900 transition-colors flex items-center justify-center"
             >
-              Área administrativa
+              Meus Pedidos
             </Link>
           </div>
         </div>
@@ -54,7 +61,13 @@ export default function Home() {
 
         {/* Card Flutuante */}
         <div className="relative w-full max-w-[400px] aspect-square lg:max-w-[450px] bg-gradient-to-br from-chocolate-800 to-chocolate-600 rounded-3xl shadow-2xl rotate-6 flex items-center justify-center border-8 border-white transition-transform hover:rotate-3 mx-4">
-          <span className="text-9xl opacity-50 select-none">🍰</span>
+          <Image
+            src="/images/ama-hero.png"
+            alt="Logo Ama Brownie"
+            fill
+            className="object-cover"
+            priority
+          />
           <div className="absolute bottom-10 -left-10 bg-white p-4 rounded-xl shadow-lg rotate-[-6deg]">
             <p className="font-serif font-bold text-chocolate-900">100% Cacau</p>
             <p className="text-xs text-gray-500">Qualidade Premium</p>

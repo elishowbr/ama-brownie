@@ -1,7 +1,9 @@
 import Link from "next/link";
-import { Plus, Search, PackageX } from "lucide-react";
+import Image from "next/image";
+import { Plus, PackageX, Pencil } from "lucide-react";
 import { getProducts } from "@/app/actions/admin";
 import DeleteProductButton from "./delete-button";
+import ProductStatusToggle from "./product-status-toggle";
 
 // Utilitário para formatar moeda
 const formatCurrency = (value: number) => {
@@ -71,14 +73,23 @@ export default async function AdminProductsPage() {
                                     <tr key={product.id} className="hover:bg-amber-50/30 transition-colors group">
                                         <td className="p-4 pl-6">
                                             <div className="flex items-center gap-4">
-                                                {/* Imagem Thumbnail */}
-                                                <div className="w-12 h-12 rounded-lg bg-amber-100 overflow-hidden flex-shrink-0 border border-amber-200">
+
+                                                <div className="w-12 h-12 rounded-lg bg-amber-100 overflow-hidden flex-shrink-0 border border-amber-200 relative">
                                                     {product.imageUrl ? (
-                                                        <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover" />
+                                                        <Image
+                                                            src={product.imageUrl}
+                                                            alt={product.name}
+                                                            fill // Preenche o quadrado de 12x12
+                                                            className="object-cover"
+                                                            sizes="48px"
+                                                        />
                                                     ) : (
-                                                        <div className="w-full h-full flex items-center justify-center text-amber-300 text-xs">Sem foto</div>
+                                                        <div className="w-full h-full flex items-center justify-center text-amber-300 text-xs font-bold">
+                                                            🍫
+                                                        </div>
                                                     )}
                                                 </div>
+
                                                 <div>
                                                     <div className="font-medium text-amber-900">{product.name}</div>
                                                     {product.promoPrice && (
@@ -88,7 +99,6 @@ export default async function AdminProductsPage() {
                                             </div>
                                         </td>
                                         <td className="p-4 text-gray-600">
-                                            {/* O "?" é necessário caso a categoria tenha sido deletada, embora nosso backend proteja isso */}
                                             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
                                                 {product.category?.name || "Sem Categoria"}
                                             </span>
@@ -103,8 +113,8 @@ export default async function AdminProductsPage() {
                                                 <span className="text-gray-700 font-medium">{formatCurrency(product.price)}</span>
                                             )}
                                         </td>
-                                        <td className="p-4 text-center">
-                                            <div className={`inline-block w-3 h-3 rounded-full ${product.isAvailable ? 'bg-green-400' : 'bg-red-300'}`} title={product.isAvailable ? "Disponível" : "Indisponível"}></div>
+                                        <td className="p-4 flex justify-center">
+                                            <ProductStatusToggle id={product.id} isAvailable={product.isAvailable} />
                                         </td>
                                         <td className="p-4 pr-6 text-right">
                                             <div className="flex items-center justify-end gap-2">
@@ -113,10 +123,9 @@ export default async function AdminProductsPage() {
                                                     className="p-2 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
                                                     title="Editar"
                                                 >
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
+                                                    <Pencil className="w-5 h-5" />
                                                 </Link>
 
-                                                <DeleteProductButton id={product.id} productName={product.name} />
                                             </div>
                                         </td>
                                     </tr>

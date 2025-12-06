@@ -9,9 +9,17 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**', // Permite qualquer caminho dentro desse site
       },
-      // Se você usar imagens de outros lugares (ex: imgur, google), adicione aqui também
+      {
+        protocol: 'https',
+        hostname: '*.public.blob.vercel-storage.com', // <--- Permite qualquer bucket da Vercel
+      }
     ],
   },
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '5mb', // Aumentei para 5MB (pode por '10mb' se precisar)
+    },
+  }
 };
 
 export default nextConfig;

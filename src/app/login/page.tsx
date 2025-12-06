@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-// Mudei o import para apontar para as Server Actions que criamos (não use mais /api/auth...)
 import { checkUserRole, authenticateUser } from "@/app/api/auth/login/route";
 import { Loader2, Phone, Lock, ArrowRight, User } from "lucide-react";
 import { useRouter } from "next/navigation";

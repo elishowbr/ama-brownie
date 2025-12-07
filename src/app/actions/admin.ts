@@ -66,13 +66,14 @@ export async function createCategory(data: any) {
 
 export async function deleteCategory(id: string) {
     try {
-        const count = await prisma.product.count({ where: { categoryId: id } });
-        if (count > 0) return { error: `Esta categoria tem ${count} produtos. Remova-os primeiro.` };
         await prisma.category.delete({ where: { id } });
+
         revalidatePath("/admin/categorias");
         revalidatePath("/admin/produtos");
+
         return { success: true };
     } catch (error) {
+        console.error(error);
         return { error: "Erro ao deletar categoria." };
     }
 }
@@ -243,6 +244,7 @@ export async function updateProduct(id: string, prevState: any, formData: FormDa
 export async function deleteProduct(id: string) {
     try {
         await prisma.product.delete({ where: { id } });
+
         revalidatePath("/admin/produtos");
         return { success: true };
     } catch (error) {

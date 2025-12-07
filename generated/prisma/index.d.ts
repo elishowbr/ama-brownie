@@ -7692,7 +7692,7 @@ export namespace Prisma {
   export type OrderItemGroupByOutputType = {
     id: string
     orderId: string
-    productId: string
+    productId: string | null
     productName: string
     quantity: number
     price: number
@@ -7731,7 +7731,7 @@ export namespace Prisma {
     chosenOption?: boolean
     observation?: boolean
     order?: boolean | OrderDefaultArgs<ExtArgs>
-    product?: boolean | ProductDefaultArgs<ExtArgs>
+    product?: boolean | OrderItem$productArgs<ExtArgs>
   }, ExtArgs["result"]["orderItem"]>
 
 
@@ -7749,19 +7749,19 @@ export namespace Prisma {
 
   export type OrderItemInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     order?: boolean | OrderDefaultArgs<ExtArgs>
-    product?: boolean | ProductDefaultArgs<ExtArgs>
+    product?: boolean | OrderItem$productArgs<ExtArgs>
   }
 
   export type $OrderItemPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "OrderItem"
     objects: {
       order: Prisma.$OrderPayload<ExtArgs>
-      product: Prisma.$ProductPayload<ExtArgs>
+      product: Prisma.$ProductPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       orderId: string
-      productId: string
+      productId: string | null
       productName: string
       quantity: number
       price: number
@@ -8132,7 +8132,7 @@ export namespace Prisma {
   export interface Prisma__OrderItemClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     order<T extends OrderDefaultArgs<ExtArgs> = {}>(args?: Subset<T, OrderDefaultArgs<ExtArgs>>): Prisma__OrderClient<$Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
-    product<T extends ProductDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ProductDefaultArgs<ExtArgs>>): Prisma__ProductClient<$Result.GetResult<Prisma.$ProductPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
+    product<T extends OrderItem$productArgs<ExtArgs> = {}>(args?: Subset<T, OrderItem$productArgs<ExtArgs>>): Prisma__ProductClient<$Result.GetResult<Prisma.$ProductPayload<ExtArgs>, T, "findUniqueOrThrow"> | null, null, ExtArgs>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -8494,6 +8494,21 @@ export namespace Prisma {
      * Additional options to pass to the `aggregate` command ${@link https://docs.mongodb.com/manual/reference/command/aggregate/#command-fields MongoDB Docs}.
      */
     options?: InputJsonValue
+  }
+
+  /**
+   * OrderItem.product
+   */
+  export type OrderItem$productArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Product
+     */
+    select?: ProductSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProductInclude<ExtArgs> | null
+    where?: ProductWhereInput
   }
 
   /**
@@ -9149,7 +9164,7 @@ export namespace Prisma {
     NOT?: OrderItemWhereInput | OrderItemWhereInput[]
     id?: StringFilter<"OrderItem"> | string
     orderId?: StringFilter<"OrderItem"> | string
-    productId?: StringFilter<"OrderItem"> | string
+    productId?: StringNullableFilter<"OrderItem"> | string | null
     productName?: StringFilter<"OrderItem"> | string
     quantity?: IntFilter<"OrderItem"> | number
     price?: FloatFilter<"OrderItem"> | number
@@ -9157,7 +9172,7 @@ export namespace Prisma {
     chosenOption?: StringNullableFilter<"OrderItem"> | string | null
     observation?: StringNullableFilter<"OrderItem"> | string | null
     order?: XOR<OrderRelationFilter, OrderWhereInput>
-    product?: XOR<ProductRelationFilter, ProductWhereInput>
+    product?: XOR<ProductNullableRelationFilter, ProductWhereInput> | null
   }
 
   export type OrderItemOrderByWithRelationInput = {
@@ -9180,7 +9195,7 @@ export namespace Prisma {
     OR?: OrderItemWhereInput[]
     NOT?: OrderItemWhereInput | OrderItemWhereInput[]
     orderId?: StringFilter<"OrderItem"> | string
-    productId?: StringFilter<"OrderItem"> | string
+    productId?: StringNullableFilter<"OrderItem"> | string | null
     productName?: StringFilter<"OrderItem"> | string
     quantity?: IntFilter<"OrderItem"> | number
     price?: FloatFilter<"OrderItem"> | number
@@ -9188,7 +9203,7 @@ export namespace Prisma {
     chosenOption?: StringNullableFilter<"OrderItem"> | string | null
     observation?: StringNullableFilter<"OrderItem"> | string | null
     order?: XOR<OrderRelationFilter, OrderWhereInput>
-    product?: XOR<ProductRelationFilter, ProductWhereInput>
+    product?: XOR<ProductNullableRelationFilter, ProductWhereInput> | null
   }, "id">
 
   export type OrderItemOrderByWithAggregationInput = {
@@ -9214,7 +9229,7 @@ export namespace Prisma {
     NOT?: OrderItemScalarWhereWithAggregatesInput | OrderItemScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"OrderItem"> | string
     orderId?: StringWithAggregatesFilter<"OrderItem"> | string
-    productId?: StringWithAggregatesFilter<"OrderItem"> | string
+    productId?: StringNullableWithAggregatesFilter<"OrderItem"> | string | null
     productName?: StringWithAggregatesFilter<"OrderItem"> | string
     quantity?: IntWithAggregatesFilter<"OrderItem"> | number
     price?: FloatWithAggregatesFilter<"OrderItem"> | number
@@ -9627,13 +9642,13 @@ export namespace Prisma {
     chosenOption?: string | null
     observation?: string | null
     order: OrderCreateNestedOneWithoutItemsInput
-    product: ProductCreateNestedOneWithoutOrderItemsInput
+    product?: ProductCreateNestedOneWithoutOrderItemsInput
   }
 
   export type OrderItemUncheckedCreateInput = {
     id?: string
     orderId: string
-    productId: string
+    productId?: string | null
     productName: string
     quantity: number
     price: number
@@ -9650,12 +9665,12 @@ export namespace Prisma {
     chosenOption?: NullableStringFieldUpdateOperationsInput | string | null
     observation?: NullableStringFieldUpdateOperationsInput | string | null
     order?: OrderUpdateOneRequiredWithoutItemsNestedInput
-    product?: ProductUpdateOneRequiredWithoutOrderItemsNestedInput
+    product?: ProductUpdateOneWithoutOrderItemsNestedInput
   }
 
   export type OrderItemUncheckedUpdateInput = {
     orderId?: StringFieldUpdateOperationsInput | string
-    productId?: StringFieldUpdateOperationsInput | string
+    productId?: NullableStringFieldUpdateOperationsInput | string | null
     productName?: StringFieldUpdateOperationsInput | string
     quantity?: IntFieldUpdateOperationsInput | number
     price?: FloatFieldUpdateOperationsInput | number
@@ -9667,7 +9682,7 @@ export namespace Prisma {
   export type OrderItemCreateManyInput = {
     id?: string
     orderId: string
-    productId: string
+    productId?: string | null
     productName: string
     quantity: number
     price: number
@@ -9687,7 +9702,7 @@ export namespace Prisma {
 
   export type OrderItemUncheckedUpdateManyInput = {
     orderId?: StringFieldUpdateOperationsInput | string
-    productId?: StringFieldUpdateOperationsInput | string
+    productId?: NullableStringFieldUpdateOperationsInput | string | null
     productName?: StringFieldUpdateOperationsInput | string
     quantity?: IntFieldUpdateOperationsInput | number
     price?: FloatFieldUpdateOperationsInput | number
@@ -10239,6 +10254,11 @@ export namespace Prisma {
     isNot?: OrderWhereInput
   }
 
+  export type ProductNullableRelationFilter = {
+    is?: ProductWhereInput | null
+    isNot?: ProductWhereInput | null
+  }
+
   export type OrderItemCountOrderByAggregateInput = {
     id?: SortOrder
     orderId?: SortOrder
@@ -10692,10 +10712,12 @@ export namespace Prisma {
     update?: XOR<XOR<OrderUpdateToOneWithWhereWithoutItemsInput, OrderUpdateWithoutItemsInput>, OrderUncheckedUpdateWithoutItemsInput>
   }
 
-  export type ProductUpdateOneRequiredWithoutOrderItemsNestedInput = {
+  export type ProductUpdateOneWithoutOrderItemsNestedInput = {
     create?: XOR<ProductCreateWithoutOrderItemsInput, ProductUncheckedCreateWithoutOrderItemsInput>
     connectOrCreate?: ProductCreateOrConnectWithoutOrderItemsInput
     upsert?: ProductUpsertWithoutOrderItemsInput
+    disconnect?: boolean
+    delete?: ProductWhereInput | boolean
     connect?: ProductWhereUniqueInput
     update?: XOR<XOR<ProductUpdateToOneWithWhereWithoutOrderItemsInput, ProductUpdateWithoutOrderItemsInput>, ProductUncheckedUpdateWithoutOrderItemsInput>
   }
@@ -11248,7 +11270,7 @@ export namespace Prisma {
     NOT?: OrderItemScalarWhereInput | OrderItemScalarWhereInput[]
     id?: StringFilter<"OrderItem"> | string
     orderId?: StringFilter<"OrderItem"> | string
-    productId?: StringFilter<"OrderItem"> | string
+    productId?: StringNullableFilter<"OrderItem"> | string | null
     productName?: StringFilter<"OrderItem"> | string
     quantity?: IntFilter<"OrderItem"> | number
     price?: FloatFilter<"OrderItem"> | number
@@ -11507,12 +11529,12 @@ export namespace Prisma {
     chosenFlavor?: string | null
     chosenOption?: string | null
     observation?: string | null
-    product: ProductCreateNestedOneWithoutOrderItemsInput
+    product?: ProductCreateNestedOneWithoutOrderItemsInput
   }
 
   export type OrderItemUncheckedCreateWithoutOrderInput = {
     id?: string
-    productId: string
+    productId?: string | null
     productName: string
     quantity: number
     price: number
@@ -11900,7 +11922,7 @@ export namespace Prisma {
 
   export type OrderItemCreateManyOrderInput = {
     id?: string
-    productId: string
+    productId?: string | null
     productName: string
     quantity: number
     price: number
@@ -11916,11 +11938,11 @@ export namespace Prisma {
     chosenFlavor?: NullableStringFieldUpdateOperationsInput | string | null
     chosenOption?: NullableStringFieldUpdateOperationsInput | string | null
     observation?: NullableStringFieldUpdateOperationsInput | string | null
-    product?: ProductUpdateOneRequiredWithoutOrderItemsNestedInput
+    product?: ProductUpdateOneWithoutOrderItemsNestedInput
   }
 
   export type OrderItemUncheckedUpdateWithoutOrderInput = {
-    productId?: StringFieldUpdateOperationsInput | string
+    productId?: NullableStringFieldUpdateOperationsInput | string | null
     productName?: StringFieldUpdateOperationsInput | string
     quantity?: IntFieldUpdateOperationsInput | number
     price?: FloatFieldUpdateOperationsInput | number
@@ -11930,7 +11952,7 @@ export namespace Prisma {
   }
 
   export type OrderItemUncheckedUpdateManyWithoutOrderInput = {
-    productId?: StringFieldUpdateOperationsInput | string
+    productId?: NullableStringFieldUpdateOperationsInput | string | null
     productName?: StringFieldUpdateOperationsInput | string
     quantity?: IntFieldUpdateOperationsInput | number
     price?: FloatFieldUpdateOperationsInput | number

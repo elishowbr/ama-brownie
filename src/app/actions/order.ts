@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/prisma";
 import { OrderType, PaymentMethod, OrderStatus } from "@/../generated/prisma"
+import { getSession } from "@/lib/auth";
 
 interface CreateOrderData {
     customerName: string;
@@ -125,5 +126,28 @@ export async function getUserByPhone(phone: string) {
         return user;
     } catch (error) {
         return null;
+    }
+}
+
+export async function getMyOrders() {
+    try {
+        // 1. Verifica quem está logado
+        const session = await getSession();
+
+        if (!session || !session.userId) {
+            return null; // Não está logado
+        }
+
+        // 2. Busca pedidos desse ID
+        const orders = await prisma.order.findMany({
+            where: { userId: session.userId as string },
+            include: { items: true },
+            orderBy: { createdAt: 'desc' }
+        });
+
+        return orders;
+    } catch (error) {
+        console.error("Erro ao buscar meus pedidos:", error);
+        return [];
     }
 }

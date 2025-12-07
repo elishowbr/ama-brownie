@@ -1,6 +1,6 @@
 import { getProducts } from "@/app/actions/admin"; // Reutilizamos a função que criaos antes!
 import StoreInterface from "@/components/StoreInterface"; // Importe o componente que criamos acima
-
+export const dynamic = 'force-dynamic';
 // Isso faz a página ser renderizada no servidor (SSR/SSG)
 export default async function HomePage() {
 

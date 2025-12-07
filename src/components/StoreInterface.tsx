@@ -65,7 +65,7 @@ export default function StoreInterface({ initialProducts }: StoreInterfaceProps)
                     {/* Linha 1: Marca e Carrinho */}
                     <div className="flex items-center justify-between mb-4">
                         <Link href="/" className="group flex flex-col cursor-pointer">
-                            <span className={`text-[10px] text-caramelo-400 font-bold tracking-[0.2em] uppercase transition-all ${scrolled ? 'opacity-0 h-0 overflow-hidden' : 'opacity-100 mb-1'}`}>
+                            <span className={`text-[10px] text-creme font-bold tracking-[0.2em] uppercase transition-all ${scrolled ? 'opacity-0 h-0 overflow-hidden' : 'opacity-100 mb-1'}`}>
                                 Cardápio Digital
                             </span>
                             <h1 className={`font-serif font-bold text-white tracking-wide transition-all ${scrolled ? 'text-xl' : 'text-3xl'}`}>

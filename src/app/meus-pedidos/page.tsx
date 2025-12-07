@@ -4,7 +4,7 @@ import { getMyOrders } from "@/app/actions/order";
 import {
     ArrowLeft, Package, Clock, CheckCircle, ChefHat, Bike, Store, XCircle, Calendar
 } from "lucide-react";
-
+export const dynamic = 'force-dynamic';
 export default async function MeusPedidosPage() {
     // 1. Busca os dados no servidor
     const orders = await getMyOrders();

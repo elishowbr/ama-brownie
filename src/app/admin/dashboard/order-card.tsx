@@ -9,7 +9,7 @@ import {
     CalendarClock
 } from "lucide-react";
 
-// Tipagem (Mantida igual)
+// Tipagem
 interface OrderProps {
     order: {
         id: string;
@@ -25,9 +25,9 @@ interface OrderProps {
             id: string;
             quantity: number;
             productName: string;
-            chosenOption: string | null;
-            chosenFlavor: string | null;
-            observation: string | null;
+            chosenOption: string | null; // Adicional
+            chosenFlavor: string | null; // Sabor (se tiver essa coluna no seu banco agora)
+            observation: string | null;  // <--- O QUE FALTAVA
         }[];
     };
 }
@@ -107,12 +107,11 @@ export default function OrderCard({ order }: OrderProps) {
         <div className={`
         group relative flex flex-col bg-white rounded-2xl border transition-all duration-300 h-full
         ${order.status === 'COMPLETED' ? 'border-gray-100 opacity-80 hover:opacity-100' : 'border-amber-100 shadow-sm hover:shadow-lg hover:-translate-y-1'}
-        `}>
+    `}>
 
-            {/* 1. CABEÇALHO DO CARD (Responsivo: Flex-col no mobile, Flex-row no desktop) */}
+            {/* 1. CABEÇALHO DO CARD */}
             <div className="p-4 sm:p-5 pb-3 border-b border-gray-50 flex flex-col sm:flex-row justify-between items-start gap-4 sm:gap-0">
-
-                {/* Lado Esquerdo: Status e ID */}
+                
                 <div>
                     <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border ${currentStatus.color} mb-2`}>
                         <StatusIcon className="w-3.5 h-3.5" />
@@ -128,7 +127,6 @@ export default function OrderCard({ order }: OrderProps) {
                     </div>
                 </div>
 
-                {/* Lado Direito: Preço e Pagamento */}
                 <div className="text-left sm:text-right w-full sm:w-auto flex flex-row sm:flex-col justify-between sm:justify-start items-center sm:items-end border-t sm:border-t-0 border-gray-50 pt-2 sm:pt-0 mt-2 sm:mt-0">
                     <div className="text-xl font-bold text-chocolate-900">
                         {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(order.total)}
@@ -140,7 +138,7 @@ export default function OrderCard({ order }: OrderProps) {
                 </div>
             </div>
 
-            {/* 1.5 ALERTA DE AGENDAMENTO (Responsivo) */}
+            {/* 1.5 ALERTA DE AGENDAMENTO */}
             {isScheduled && scheduleDate && (
                 <div className="mx-4 sm:mx-5 mb-3 bg-indigo-50 border border-indigo-100 p-2.5 rounded-lg flex items-start sm:items-center gap-3 animate-pulse mt-3 sm:mt-0">
                     <div className="bg-indigo-100 p-1.5 rounded-full text-indigo-700 shrink-0">
@@ -196,23 +194,31 @@ export default function OrderCard({ order }: OrderProps) {
                             </span>
                         </div>
 
-                        {/* VISUALIZAÇÃO DO SABOR (Destaque Roxo) */}
+                        {/* Se tiver Sabor (ChosenFlavor) */}
                         {item.chosenFlavor && (
-                            <div className="ml-0 sm:ml-8 text-xs font-bold text-purple-700 mt-1 flex items-center gap-1">
+                             <div className="ml-0 sm:ml-8 text-xs font-bold text-purple-700 mt-1 flex items-center gap-1">
                                 <span className="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
                                 {item.chosenFlavor}
                             </div>
                         )}
 
-                        {/* VISUALIZAÇÃO DO ADICIONAL (Texto cinza) */}
+                        {/* Se tiver Adicional (ChosenOption) */}
                         {item.chosenOption && (
-                            <div className="ml-0 sm:ml-8 text-xs text-gray-500 mt-0.5 flex items-center gap-1 pl-2">
-                                + {item.chosenOption}
+                            <div className="ml-0 sm:ml-8 text-xs text-gray-500 mt-1 flex items-center gap-1 pl-2 border-l-2 border-gray-100">
+                                <span className="w-1 h-1 rounded-full bg-gray-300"></span>
+                                {item.chosenOption}
                             </div>
                         )}
 
-                        {/* OBSERVAÇÃO */}
-                        {/* ... */}
+                        {/* --- OBSERVAÇÃO (NOVO) --- */}
+                        {item.observation && (
+                            <div className="mt-2 ml-0 sm:ml-8 bg-amber-50 border border-amber-100 text-amber-800 text-xs p-2 rounded-lg flex gap-2 items-start animate-fadeIn">
+                                <span className="font-bold not-italic shrink-0 text-amber-600 mt-0.5">⚠️</span>
+                                <span className="break-words italic leading-snug">
+                                    "{item.observation}"
+                                </span>
+                            </div>
+                        )}
                     </div>
                 ))}
             </div>

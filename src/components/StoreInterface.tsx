@@ -6,6 +6,7 @@ import ProductCard from "@/components/ProductCard";
 import ProductModal from "@/components/ProductModal";
 import { useCart } from "@/context/CartContext";
 import { ShoppingBag, ChevronRight } from "lucide-react";
+import Footer from "./Footer";
 
 interface Produto {
     id: string;
@@ -161,6 +162,8 @@ export default function StoreInterface({ initialProducts }: StoreInterfaceProps)
                     </div>
                 )}
             </main>
+
+            <Footer />
 
             {/* MODAL */}
             {produtoSelecionado && (

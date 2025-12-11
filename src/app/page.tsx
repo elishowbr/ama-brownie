@@ -69,8 +69,8 @@ export default function Home() {
             priority
           />
           <div className="absolute bottom-10 -left-10 bg-white p-4 rounded-xl shadow-lg rotate-[-6deg]">
-            <p className="font-serif font-bold text-chocolate-900">100% Cacau</p>
-            <p className="text-xs text-gray-500">Qualidade Premium</p>
+            <p className="font-serif font-bold text-chocolate-900">O melhor brownie</p>
+            <p className="text-xs text-gray-500">do muuundo!</p>
           </div>
         </div>
       </div>

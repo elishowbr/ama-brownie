@@ -49,7 +49,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR">
-      <body className={`${poppins.variable} ${anticDidone.variable}`}>
+      <body className={`${poppins.variable} ${anticDidone.variable} antialiased`}>
         <CartProvider>
           {children}
           <CartSidebar />

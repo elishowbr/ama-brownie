@@ -1,6 +1,6 @@
 # Ama Brownie - E-commerce para Confeitaria Artesanal
 
-![Project Status](https://img.shields.io/badge/status-em_desenvolvimento-orange)
+![Project Status](https://img.shields.io/badge/status-online-green)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 
 Uma plataforma de e-commerce completa e moderna desenvolvida para a **Ama Brownie**, focada em oferecer uma experiência de compra fluida para clientes e um gerenciamento robusto para a administração.

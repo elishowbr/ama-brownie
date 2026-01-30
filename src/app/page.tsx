@@ -35,6 +35,7 @@ export default function Home() {
           {/* BOTÕES */}
           <div className="w-full max-w-xs flex flex-col space-y-4 mt-8">
             <Link
+              prefetch
               href="/main"
               className="w-full bg-chocolate-900 hover:bg-chocolate-800 text-white font-bold py-4 px-6 rounded-2xl shadow-lg transition-transform transform hover:scale-105 flex items-center justify-center gap-2"
             >
